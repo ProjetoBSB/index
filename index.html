@@ -19,6 +19,7 @@
             --primary: #6366f1;      /* indigo-500 */
             --primary-hover: #4f46e5; /* indigo-600 */
             --accent: #a855f7;       /* purple-500 */
+            --heart-color: #ec4899;  /* pink-500 */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,12 +43,11 @@
             backdrop-filter: blur(10px);
             border-bottom: 1px solid #1e293b;
             z-index: 100;
-            height: 70px; /* Aumentei levemente */
+            height: 70px;
             display: flex;
             align-items: center;
         }
 
-        /* Container Genérico (Layout Base) */
         .container {
             width: 100%;
             max-width: 1200px;
@@ -55,7 +55,6 @@
             padding: 0 1rem;
         }
 
-        /* Container Flex (Para Nav e Barras de Controle) */
         .flex-container {
             display: flex;
             justify-content: space-between;
@@ -66,7 +65,7 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-weight: 800; /* Mais bold */
+            font-weight: 800;
             font-size: 1.3rem;
             letter-spacing: -0.5px;
         }
@@ -83,25 +82,26 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
-        /* Menu Melhorado */
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { 
+        /* Menu Principal */
+        .nav-links { display: flex; gap: 2rem; position: relative; }
+        .nav-item { position: relative; }
+        
+        .nav-links > .nav-item > a { 
             color: var(--text-muted); 
             font-size: 0.85rem; 
             font-weight: 700; 
             text-transform: uppercase;
             letter-spacing: 1px;
-            position: relative;
-            padding: 5px 0;
+            padding: 25px 0; /* Aumentado para facilitar hover */
+            display: block;
             transition: color 0.3s;
         }
-        .nav-links a:hover { color: white; }
+        .nav-links > .nav-item > a:hover { color: white; }
         
-        /* Efeito de Sublinhado no Menu */
-        .nav-links a::after {
+        .nav-links > .nav-item > a::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: 15px;
             left: 0;
             width: 0%;
             height: 2px;
@@ -109,9 +109,44 @@
             transition: width 0.3s ease-in-out;
             box-shadow: 0 0 8px var(--accent);
         }
-        .nav-links a:hover::after {
-            width: 100%;
+        .nav-links > .nav-item > a:hover::after { width: 100%; }
+
+        /* Dropdown Submenu */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            min-width: 220px;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 0.5rem 0;
+            z-index: 110;
+            max-height: 400px;
+            overflow-y: auto;
         }
+        
+        .nav-item:hover .dropdown-menu { display: block; animation: fadeIn 0.2s ease; }
+        
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: none;
+            border-bottom: 1px solid #334155;
+            transition: 0.2s;
+        }
+        .dropdown-menu a:last-child { border-bottom: none; }
+        .dropdown-menu a:hover { background: var(--bg-card-hover); color: white; padding-left: 20px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
         /* Mobile Menu */
         .mobile-toggle { display: none; background: none; border: none; color: white; cursor: pointer; }
@@ -124,6 +159,8 @@
             flex-direction: column;
             padding: 1rem;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-height: 80vh;
+            overflow-y: auto;
         }
         .mobile-menu.active { display: flex; }
         .mobile-menu a { padding: 1rem 0; border-bottom: 1px solid #334155; font-weight: 600; text-transform: uppercase; font-size: 0.9rem;}
@@ -135,8 +172,8 @@
 
         /* --- HERO / CAROUSEL --- */
         #hero {
-            height: 55vh;
-            min-height: 450px;
+            height: 60vh;
+            min-height: 480px;
             position: relative;
             margin-top: 70px;
             overflow: hidden;
@@ -157,6 +194,8 @@
             transition: opacity 1s ease;
             z-index: 1;
             padding: 1rem;
+            background-size: cover;
+            background-position: center;
         }
         
         .hero-slide.active { opacity: 1; z-index: 2; }
@@ -166,8 +205,14 @@
             background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
             z-index: -1;
         }
+        
+        .hero-overlay-dark {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.7); /* Mais escuro para legibilidade da capa */
+            backdrop-filter: blur(3px);
+            z-index: -1;
+        }
 
-        /* Texturas de fundo opcionais para dar profundidade */
         .hero-texture {
             position: absolute; inset: 0;
             background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
@@ -185,25 +230,33 @@
             50% { transform: translateY(-15px); }
         }
 
-        /* Carousel Progress Indicators */
         .carousel-indicators {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 10px;
+            gap: 14px;
             z-index: 10;
+            width: 90%;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         .indicator-dot {
-            width: 10px; height: 10px;
+            width: 12px; height: 12px;
             border-radius: 50%;
             background: rgba(255,255,255,0.3);
-            transition: 0.3s;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
         }
-        .indicator-dot.active { background: white; transform: scale(1.2); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .indicator-dot::after {
+            content: ''; position: absolute; top: -5px; bottom: -5px; left: -5px; right: -5px;
+        }
+        .indicator-dot:hover { background: rgba(255,255,255,0.6); transform: scale(1.1); }
+        .indicator-dot.active { background: white; transform: scale(1.3); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
 
-        /* Barra de Progresso do Tempo */
         .carousel-progress-bar {
             position: absolute;
             bottom: 0;
@@ -215,16 +268,12 @@
         }
         .carousel-progress-fill {
             height: 100%;
-            background: var(--accent); /* ou white */
+            background: var(--accent);
             width: 0;
-            /* Animação controlada via CSS, assumindo 8s de intervalo */
             animation: progressFill 8s linear infinite;
         }
 
-        @keyframes progressFill {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
+        @keyframes progressFill { from { width: 0%; } to { width: 100%; } }
 
         /* Botões */
         .btn {
@@ -248,24 +297,38 @@
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
         .btn-primary:hover { background: var(--primary-hover); }
 
-        /* --- PLAYLIST BAR --- */
+        /* --- PLAYLIST BAR (Sticky) --- */
         .playlist-bar {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(8px);
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(12px);
             position: sticky;
-            top: 70px; /* Ajustado para nova altura do nav */
+            top: 70px; 
             z-index: 90;
-            padding: 1rem 0;
+            padding: 0.75rem 0;
             border-bottom: 1px solid #334155;
             border-top: 1px solid #334155;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
+        
+        .sticky-play-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .sticky-play-btn:hover { transform: scale(1.1); background: white; color: var(--primary); }
 
         /* --- SECTIONS --- */
-        /* Correção: Agora as seções empilham verticalmente pois .container não é mais flex globalmente */
         .section-wrapper {
-            margin-bottom: 4rem; /* Espaço entre as seções (países) */
-            scroll-margin-top: 140px; /* Para o scroll não ficar escondido atrás do header */
+            margin-bottom: 4rem; 
+            scroll-margin-top: 150px; 
+            padding-top: 20px;
         }
 
         .section-header {
@@ -311,7 +374,6 @@
             gap: 1rem;
         }
 
-        /* Icon Animation Logic */
         .album-art {
             width: 48px; height: 48px;
             border-radius: 8px;
@@ -323,13 +385,11 @@
             color: white;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        /* Expand on hover or active */
         .song-card:hover .album-art, .song-card.active .album-art {
             width: 72px; height: 72px;
             box-shadow: 0 8px 15px rgba(0,0,0,0.3);
         }
         
-        /* EQ Animation bars */
         .eq-bars { display: none; align-items: flex-end; gap: 3px; height: 24px; position: absolute; bottom: 12px; }
         .bar { width: 4px; background: white; border-radius: 2px; animation: eq 0.8s infinite ease-in-out alternate; }
         .bar:nth-child(1) { animation-duration: 0.6s; height: 10px; }
@@ -337,10 +397,7 @@
         .bar:nth-child(3) { animation-duration: 0.55s; height: 12px; }
         .song-card.active.playing .eq-bars { display: flex; }
 
-        @keyframes eq {
-            0% { height: 5px; }
-            100% { height: 20px; }
-        }
+        @keyframes eq { 0% { height: 5px; } 100% { height: 20px; } }
 
         .song-info { flex-grow: 1; min-width: 0; }
         .song-title { font-weight: 600; font-size: 1.05rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
@@ -350,6 +407,7 @@
         .song-actions { display: flex; gap: 0.5rem; align-items: center; }
         .action-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.6rem; border-radius: 50%; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .action-btn:hover { color: white; background: var(--bg-card-hover); transform: scale(1.1); }
+        
         .play-btn-small { 
             width: 44px; height: 44px; 
             border-radius: 50%; 
@@ -361,6 +419,16 @@
         }
         .song-card.active .play-btn-small { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4); }
         .song-card:hover .play-btn-small:hover { background: white; color: var(--primary); transform: scale(1.1); }
+
+        /* Favorite Button */
+        .fav-btn {
+            color: var(--text-muted);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .fav-btn:hover { color: var(--heart-color); transform: scale(1.2); }
+        .fav-btn.active { color: var(--heart-color); fill: var(--heart-color); }
+        
+        /* Removed .locked class styles as per request */
 
         /* Lyrics Accordion */
         .lyrics-panel {
@@ -453,12 +521,18 @@
             
             <button class="mobile-toggle" onclick="toggleMenu()"><i data-lucide="menu"></i></button>
 
-            <div class="nav-links">
-                <a href="#home">Início</a>
-                <a href="#playlist">Playlist</a>
-                <a href="#clips">Clipes</a>
-                <a href="#about">Sobre</a>
-            </div>
+            <ul class="nav-links">
+                <li class="nav-item"><a href="#home">Início</a></li>
+                <li class="nav-item">
+                    <a href="#playlist">Playlist</a>
+                    <!-- Submenu Dropdown -->
+                    <div class="dropdown-menu" id="playlistSubmenu">
+                        <!-- Items inseridos via JS -->
+                    </div>
+                </li>
+                <li class="nav-item"><a href="#clips">Clipes</a></li>
+                <li class="nav-item"><a href="#about">Sobre</a></li>
+            </ul>
         </div>
         <div class="mobile-menu" id="mobileMenu">
             <a href="#home" onclick="toggleMenu()">Início</a>
@@ -484,19 +558,24 @@
         </div>
     </section>
 
-    <!-- PLAYLIST CONTROLS -->
+    <!-- PLAYLIST CONTROLS (STICKY) -->
     <div class="playlist-bar">
         <div class="container flex-container">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i data-lucide="list-music" class="text-primary"></i>
-                <h2 style="font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Playlist Oficial</h2>
-                <span id="totalSongs" style="font-size: 0.75rem; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; padding: 3px 10px; border-radius: 99px; font-weight: 600;">0 faixas</span>
+            <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0;">
+                <i data-lucide="list-music" class="text-primary flex-shrink-0"></i>
+                <div style="display:flex; flex-direction:column; min-width: 0;">
+                    <h2 id="stickyTitle" style="font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 8px;">
+                        Carregando...
+                        <!-- Botão de Play da Seção (Injetado via JS) -->
+                    </h2>
+                    <span id="stickyCount" style="font-size: 0.75rem; color: #a5b4fc; font-weight: 600;">...</span>
+                </div>
             </div>
-            <div style="display: flex; gap: 0.75rem;">
-                <button class="btn btn-primary" onclick="playSong(0)">
-                    <i data-lucide="play" style="width: 16px;"></i> Tocar Tudo
+            <div style="display: flex; gap: 0.75rem; flex-shrink: 0;">
+                <button class="btn btn-primary" onclick="playAllSongs()" title="Toca todas as músicas de todas as seções (exceto Destaques duplicados)">
+                    <i data-lucide="play" style="width: 16px;"></i> <span id="btnPlayAllText">Tocar Tudo</span>
                 </button>
-                <button class="btn btn-glass" style="background: #334155;" onclick="shuffleSongs()">
+                <button class="btn btn-glass" style="background: #334155;" onclick="shuffleSongs()" title="Misturar ordem das músicas">
                     <i data-lucide="shuffle" style="width: 16px;"></i>
                 </button>
             </div>
@@ -514,7 +593,8 @@
             <div class="avatar-container">
                 <div class="avatar-glow"></div>
                 <div class="avatar">
-                    <i data-lucide="user" size="80"></i>
+                    <!-- Caminho relativo direto -->
+                    <img src="./Foto Leandro IPEA 1x1.jpeg" onerror="this.src='https://via.placeholder.com/220?text=Foto+Usuario'" alt="Idealizador do Projeto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                 </div>
             </div>
             <div style="flex: 1;">
@@ -579,238 +659,628 @@
 
     <script>
         // --- DADOS ---
-        const sections = [
+        const rawSections = [
             {
                 id: 'comunicacao', profile: 'Comunicação', country: 'Brasil', flag: '🇧🇷',
-                gradient: 'linear-gradient(135deg, #15803d, #eab308)', // Green to Yellow darker
+                gradient: 'linear-gradient(135deg, #15803d, #eab308)', 
                 desc: 'A voz que conecta e informa.',
                 songs: [
-                    { title: 'Samba da Comunicação (Bossa v2)', file: 'SAMBAD~3.MP3', duration: '3:45' },
-                    { title: 'Samba da Comunicação (Bossa v1) Principal', file: 'SA9AF6~1.MP3', duration: '4:10', isPrincipal: true },
-                    { title: 'Samba da Comunicação (1x)', file: 'SAMBAD~1.MP3', duration: '3:20' }
+                    { title: 'Samba da Comunicação (Bossa v2)', file: 'SAMBAD~3.MP3', duration: '5:10' },
+                    { title: 'Samba da Comunicação (Bossa v1) Principal', file: 'SA9AF6~1.MP3', duration: '8:29', isPrincipal: true },
+                    { title: 'Samba da Comunicação (1x)', file: 'SAMBAD~1.MP3', duration: '4:42' },
+                    { title: 'Samba da Comunicação (Bossa v1)', file: 'SAMBAD~2.MP3', duration: '4:47' }
                 ]
             },
             {
                 id: 'editorial', profile: 'Editorial', country: 'Rússia', flag: '🇷🇺',
-                gradient: 'linear-gradient(135deg, #b91c1c, #1d4ed8)', // Red to Blue darker
+                gradient: 'linear-gradient(135deg, #b91c1c, #1d4ed8)', 
                 desc: 'A precisão na escrita e na história.',
                 songs: [
-                    { title: 'Lapidando Histórias (Edit) Principal', file: 'LAPIDA~4.MP3', duration: '4:05', isPrincipal: true },
-                    { title: 'Lapidando Histórias (Ópera Russa)', file: 'LA67B6~1.MP3', duration: '4:15' }
+                    { title: 'Lapidando Histórias (Edit) Principal', file: 'LAPIDA~4.MP3', duration: '8:48', isPrincipal: true },
+                    { title: 'Lapidando Histórias (Similar a Original) (Cover)', file: 'LA789E~1.MP3', duration: '5:10' },
+                    { title: 'Lapidando Histórias 2 (Ópera Russa) (Cover)', file: 'LA67B6~1.MP3', duration: '5:37' },
+                    { title: 'Lapidando Histórias (Editar inicio)', file: 'LA16FA~1.MP3', duration: '5:08' },
+                    { title: 'Lapidando Histórias Opera', file: 'LAPIDA~1.MP3', duration: '4:40' }
                 ]
             },
             {
                 id: 'gestao', profile: 'Gestão', country: 'China', flag: '🇨🇳',
-                gradient: 'linear-gradient(135deg, #b91c1c, #eab308)', // Red to Yellow
+                gradient: 'linear-gradient(135deg, #b91c1c, #eab308)', 
                 desc: 'Organização e eficiência em cada peça.',
                 songs: [
-                    { title: 'Peça por Peça Big (Gestao)', file: 'PEAAPE~1.MP3', duration: '3:12' }
-                ]
-            },
-            {
-                id: 'avaliacao', profile: 'PP Avaliação', country: 'África do Sul', flag: '🇿🇦',
-                gradient: 'linear-gradient(135deg, #a16207, #15803d)', // Gold/Brown to Green
-                desc: 'Avaliar é curar. O olhar crítico que constrói.',
-                songs: [
-                    { title: 'Avaliar é Curar (Yebo Sabela Mix)', file: 'AVALIA~1.MP3', duration: '3:45' }
+                    { title: 'Peça por Peça Big (Gestao)', file: 'PEAAPE~1.MP3', duration: '3:18' },
+                    { title: 'Peça por peça (Logistica)', file: 'PEAPOR~1.MP3', duration: '2:50' }
                 ]
             },
             {
                 id: 'guerreiros', profile: 'Guerreiros da Nação', country: 'BRICS', flag: '🌐',
-                gradient: 'linear-gradient(135deg, #1d4ed8, #7e22ce)', // Blue to Purple
+                gradient: 'linear-gradient(135deg, #1d4ed8, #7e22ce)', 
                 desc: 'A força conjunta das nações.',
                 songs: [
-                    { title: 'Guerreiros da Nação CLIPE Principal', file: 'GU054F~1.MP3', duration: '4:30', isPrincipal: true },
-                    { title: 'Guerreiros da Nação (Coral)', file: 'GU051A~1.MP3', duration: '4:00' }
+                    { title: 'Guerreiros da Nação CLIPE (Cover) Principal', file: 'GU054F~1.MP3', duration: '4:52', isPrincipal: true },
+                    { title: 'Guerreiros da Nação (Coral)', file: 'GU051A~1.MP3', duration: '5:14' },
+                    { title: 'Guerreiros de Mil Labores (Edit)', file: 'GUERRE~1.MP3', duration: '3:57' },
+                    { title: 'Guerreiros de Mil Labores', file: 'GU48F9~1.MP3', duration: '7:23' }
+                ]
+            },
+            {
+                id: 'bsb_boys', profile: 'Brics Street Boys', country: 'BRICS', flag: '🧱',
+                gradient: 'linear-gradient(135deg, #4f46e5, #ec4899)', 
+                desc: 'O hino que une o mundo.',
+                songs: [
+                    { title: 'BRICS Street Boys (Principal) (Remix)', file: 'BRICSS~4.MP3', duration: '3:21', isPrincipal: true },
+                    { title: 'BRICS Street Boys (Anthem)', file: 'BRICSS~3.MP3', duration: '5:36' },
+                    { title: 'BRICS Street Boys (Rublo) (Cover)', file: 'BR678D~1.MP3', duration: '3:37' }
+                ]
+            },
+            {
+                id: 'avaliacao', profile: 'PP Avaliação', country: 'África do Sul', flag: '🇿🇦',
+                gradient: 'linear-gradient(135deg, #a16207, #15803d)', 
+                desc: 'Avaliar é curar. O olhar crítico que constrói.',
+                songs: [
+                    { title: 'Avaliar é Curar (Yebo Sabela Mix)', file: 'AVALIA~1.MP3', duration: '4:44' },
+                    { title: 'Avaliar é curar (Nova Sociedade rap)', file: 'AVF649~1.MP3', duration: '3:37' },
+                    { title: 'Avaliar é curar 2 (Afro-trance)', file: 'AVALIA~4.MP3', duration: '5:10' }
+                ]
+            },
+            {
+                id: 'desenvolvimento', profile: 'PP Desenvolvimento', country: 'Etiópia', flag: '🇪🇹',
+                gradient: 'linear-gradient(135deg, #16a34a, #dc2626)', 
+                desc: 'Raízes e Rotas para o desenvolvimento.',
+                songs: [
+                    { title: 'Raiz do Amanhã (Selam Lij) 6 Principal', file: 'RAIZDO~3.MP3', duration: '7:28', isPrincipal: true },
+                    { title: 'Raiz do Amanhã (Selam Lij) 6 Aieo (Remix)', file: 'RAIZDO~2.MP3', duration: '5:39' },
+                    { title: 'Raízes e Rotas', file: 'RAZESE~1.MP3', duration: '4:09' }
+                ]
+            },
+            {
+                id: 'sociedade', profile: 'PP Sociedade', country: 'Irã', flag: '🇮🇷',
+                gradient: 'linear-gradient(135deg, #22c55e, #ef4444)', 
+                desc: 'A Arte e a Voz do Comum.',
+                songs: [
+                    { title: 'A Arte do Comum (Dance)', file: 'AARTED~2.MP3', duration: '6:29' },
+                    { title: 'A Voz do Comum 2', file: 'AVOZDO~3.MP3', duration: '6:55' },
+                    { title: 'A Arte do Comum (Remix)', file: 'AARTED~1.MP3', duration: '6:06' }
+                ]
+            },
+            {
+                id: 'sustentabilidade', profile: 'PP Sustentabilidade', country: 'Indonésia', flag: '🇮🇩',
+                gradient: 'linear-gradient(135deg, #dc2626, #cbd5e1)', 
+                desc: 'O Ritmo da Terra e o Pedido da Natureza.',
+                songs: [
+                    { title: 'Ritmo da Terra (Principal Gemini v5)', file: 'RI64C9~1.MP3', duration: '6:18', isPrincipal: true },
+                    { title: 'Pedido da Natureza (Sertanejo)', file: 'PEDIDO~1.MP3', duration: '6:13' },
+                    { title: 'Ritmo da Terra (Rock - Epic Intro)', file: 'RIE404~1.MP3', duration: '7:39' },
+                    { title: 'Ritmo da Terra (Choveu Saber)', file: 'RITMOD~1.MP3', duration: '6:05' }
+                ]
+            },
+            {
+                id: 'somos_ipea', profile: 'Somos IPEA', country: 'BRICS', flag: '🌐',
+                gradient: 'linear-gradient(135deg, #0ea5e9, #3b82f6)', 
+                desc: 'A identidade que nos une.',
+                songs: [
+                    { title: 'Somos IPEA (Extended)', file: 'SOMOSI~2.MP3', duration: '3:13' },
+                    { title: 'We Are IPEA', file: 'WEAREI~1.MP3', duration: '4:00' }
+                ]
+            },
+            {
+                id: 'ti', profile: 'TI', country: 'Índia', flag: '🇮🇳',
+                gradient: 'linear-gradient(135deg, #f97316, #22c55e)', 
+                desc: 'Por trás de um clique.',
+                songs: [
+                    { title: 'Por trás de um clique (Remix 8-bit)', file: 'PORTRS~1.MP3', duration: '4:56' },
+                    { title: 'Por trás de um clique Primeira', file: 'PORTRS~2.MP3', duration: '3:35' }
                 ]
             }
         ];
 
-        // Flatten songs array for easier playback logic
-        let allSongs = [];
-        sections.forEach(section => {
+        // --- GESTÃO DE FAVORITOS ---
+        const userFavorites = new Set(JSON.parse(localStorage.getItem('bsbFavorites') || '[]'));
+
+        function toggleFavorite(filename) {
+            // Remove a lógica que impedia desmarcar principais
+            if (userFavorites.has(filename)) {
+                userFavorites.delete(filename);
+            } else {
+                userFavorites.add(filename);
+            }
+            
+            // Persistir
+            localStorage.setItem('bsbFavorites', JSON.stringify([...userFavorites]));
+
+            // Atualizar UI
+            // 1. Recarregar Seção de Favoritos
+            generateFavoritesSection();
+            
+            // Re-render only Favorites Grid to avoid full page flicker
+            const favGrid = document.getElementById('grid-favoritos');
+            if (favGrid) {
+                favGrid.innerHTML = renderSongCards(sections[1]); // sections[1] agora é favoritos
+                lucide.createIcons({ root: favGrid });
+            }
+            
+            // Se estivermos vendo Favoritos na sticky bar, atualiza contador
+            if (document.getElementById('stickyTitle').innerText.includes('Meus Favoritos')) {
+                 updateStickyBar('favoritos');
+            }
+
+            // 2. Atualizar ícones em todos os cards que correspondem a essa música
+            updateHeartIcons(filename);
+        }
+
+        function updateHeartIcons(filename) {
+            const isFav = userFavorites.has(filename);
+            const buttons = document.querySelectorAll(`.fav-btn[data-file="${filename}"]`);
+            
+            buttons.forEach(btn => {
+                const icon = btn.querySelector('svg'); 
+                if (isFav) {
+                    btn.classList.add('active');
+                    if(icon) icon.setAttribute('fill', 'currentColor');
+                } else {
+                    btn.classList.remove('active');
+                    if(icon) icon.setAttribute('fill', 'none');
+                }
+            });
+        }
+
+        // --- PREPARAÇÃO DE SEÇÕES ---
+        // 1. Album Guerreiros (Principais)
+        // 2. Favoritos (Vazio ou populado pelo usuário)
+        // 3. Resto
+        let albumSection = {};
+        let favoritesSection = {};
+        let sections = [];
+
+        function generateData() {
+            // A. Gerar Album Guerreiros (Apenas Principais)
+            const principalSongs = [];
+            rawSections.forEach(sec => {
+                sec.songs.forEach(song => {
+                    if(song.isPrincipal) {
+                        principalSongs.push({
+                            ...song,
+                            displayContext: sec.profile
+                        });
+                    }
+                });
+            });
+
+            albumSection = {
+                id: 'album-guerreiros',
+                profile: 'Guerreiros da Nação',
+                country: 'Álbum Oficial',
+                flag: '🌟',
+                gradient: 'linear-gradient(135deg, #ec4899, #db2777)', // Pink theme
+                desc: 'A coleção oficial com os principais hits do projeto.',
+                songs: principalSongs,
+                heroImage: './Capa Principal Final Projeto BSB Guerreiros da Nação 03.10.25.png'
+            };
+
+            // B. Gerar Favoritos (Baseado no localStorage)
+            generateFavoritesSection();
+
+            // C. Combinar
+            // Ordem: Album -> Favoritos -> Resto
+            sections = [albumSection, favoritesSection, ...rawSections];
+        }
+        
+        function generateFavoritesSection() {
+            const favSongs = [];
+            rawSections.forEach(sec => {
+                sec.songs.forEach(song => {
+                    if(userFavorites.has(song.file)) {
+                        favSongs.push({
+                            ...song,
+                            displayContext: sec.profile
+                        });
+                    }
+                });
+            });
+
+            favoritesSection = {
+                id: 'favoritos',
+                profile: 'Meus Favoritos',
+                country: 'Sua Seleção',
+                flag: '❤️',
+                gradient: 'linear-gradient(135deg, #f43f5e, #be123c)', // Red theme
+                desc: 'Sua lista pessoal de músicas favoritas.',
+                songs: favSongs
+            };
+            
+            // Update reference in main array if already initialized
+            if(sections.length > 1) {
+                sections[1] = favoritesSection;
+            }
+        }
+
+        // --- LISTA GLOBAL PARA PLAYBACK ---
+        // Evita duplicatas ao tocar tudo. Usa apenas rawSections.
+        let allPlayableSongs = [];
+        rawSections.forEach(section => {
             section.songs.forEach(song => {
-                allSongs.push({
+                allPlayableSongs.push({
                     ...song,
                     sectionName: section.profile,
                     sectionGradient: section.gradient,
-                    flag: section.flag
+                    flag: section.flag,
+                    sectionId: section.id
                 });
             });
         });
+        
+        let playQueue = []; 
 
         // --- STATE ---
-        let currentSongIndex = -1;
+        let currentSongIndex = -1; 
         let isPlaying = false;
         const audio = document.getElementById('audioPlayer');
-        const CAROUSEL_INTERVAL = 8000; // 8 segundos
+        const CAROUSEL_INTERVAL = 8000;
 
         // --- RENDER ---
         function init() {
-            // Render Hero Carousel Slides
+            generateData();
+
             const heroContainer = document.getElementById('hero');
             const playlistContainer = document.getElementById('playlist');
             const indicatorsContainer = document.getElementById('carouselIndicators');
-            
-            document.getElementById('totalSongs').innerText = allSongs.length + ' faixas';
+            const submenuContainer = document.getElementById('playlistSubmenu');
 
+            // Atualiza Texto do Botão Tocar Tudo
+            document.getElementById('btnPlayAllText').innerText = `Tocar Tudo (${allPlayableSongs.length})`;
+
+            // Popula Submenu
+            submenuContainer.innerHTML = '';
+            sections.forEach(sec => {
+                const link = document.createElement('a');
+                link.href = `#${sec.id}`;
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    scrollToSection(sec.id);
+                };
+                link.innerHTML = `<span>${sec.flag}</span> ${sec.profile}`;
+                submenuContainer.appendChild(link);
+            });
+
+            // Limpa containers
+            heroContainer.innerHTML = '<div class="hero-texture"></div>';
+            playlistContainer.innerHTML = '';
+            indicatorsContainer.innerHTML = '';
+
+            // Re-insere barra de progresso (pois limpamos o hero)
+            const progressBar = document.createElement('div');
+            progressBar.className = 'carousel-progress-bar';
+            progressBar.innerHTML = '<div class="carousel-progress-fill" id="carouselProgressFill"></div>';
+            heroContainer.appendChild(progressBar);
+            heroContainer.appendChild(indicatorsContainer); // Garante ordem
+
+            // Renderiza Seções e Banner
             sections.forEach((section, idx) => {
-                // Hero Slide
+                // Banner (TODAS as seções)
                 const slide = document.createElement('div');
                 slide.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
-                slide.style.background = section.gradient;
-                slide.innerHTML = `
-                    <div class="hero-overlay"></div>
-                    <div class="hero-flag">${section.flag}</div>
-                    <h1 class="hero-title">${section.profile}</h1>
-                    <p class="hero-desc">${section.desc}</p>
-                    <div style="display:flex; gap: 1rem;">
-                        <button class="btn btn-glass" onclick="scrollToSection('${section.id}')">
-                            <i data-lucide="music"></i> Ver Músicas
-                        </button>
-                        <button class="btn btn-white" style="color: ${section.id === 'comunicacao' ? '#15803d' : '#1e293b'}">
-                            <i data-lucide="user"></i> Perfil IPEA
-                        </button>
-                    </div>
-                `;
-                // Insert before the indicators/progress elements (which are last children of hero)
+                
+                // Lógica especial para o primeiro slide (Capa do Álbum)
+                if (idx === 0 && section.heroImage) {
+                        slide.style.backgroundImage = `url('${section.heroImage}')`;
+                        slide.innerHTML = `
+                        <div class="hero-overlay-dark"></div>
+                        <div style="z-index: 10; text-align: center; padding: 20px;">
+                            <h1 class="hero-title" style="margin-bottom:0.2rem; font-size:3rem; text-shadow:0 4px 20px black;">${section.profile}</h1>
+                            <p class="hero-desc" style="font-weight:600; text-shadow:0 2px 10px black; margin-bottom: 2rem;">${section.desc}</p>
+                            <button class="btn btn-primary" onclick="scrollToSection('${section.id}')" style="box-shadow: 0 4px 25px rgba(99, 102, 241, 0.6); transform: scale(1.1);">
+                                <i data-lucide="music"></i> Ouvir Álbum
+                            </button>
+                        </div>
+                        `;
+                } else {
+                    // Slide Padrão
+                    slide.style.background = section.gradient;
+                    slide.innerHTML = `
+                        <div class="hero-overlay"></div>
+                        <div class="hero-flag">${section.flag}</div>
+                        <h1 class="hero-title">${section.profile}</h1>
+                        <p class="hero-desc">${section.desc}</p>
+                        <div style="display:flex; gap: 1rem;">
+                            <button class="btn btn-glass" onclick="scrollToSection('${section.id}')">
+                                <i data-lucide="music"></i> Ver Músicas
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                // Insere antes dos indicadores
                 heroContainer.insertBefore(slide, indicatorsContainer);
 
-                // Indicator Dot
                 const dot = document.createElement('div');
                 dot.className = `indicator-dot ${idx === 0 ? 'active' : ''}`;
+                // Click logic added in previous step, kept here
+                dot.onclick = () => goToSlide(idx);
                 indicatorsContainer.appendChild(dot);
 
-                // Playlist Section (WRAPPER para espaçamento correto)
+                // Cria o container da seção (Playlist Grid)
                 const sectionDiv = document.createElement('div');
                 sectionDiv.id = section.id;
-                sectionDiv.className = 'section-wrapper'; // Classe para empilhar
-                sectionDiv.innerHTML = `
-                    <div class="section-header">
-                        <div class="section-flag">${section.flag}</div>
-                        <div class="section-title">
-                            <h3>${section.profile} <span class="badge">${section.country}</span></h3>
-                            <small style="color: #94a3b8; display:flex; align-items:center; gap:4px; margin-top:4px; cursor:pointer;" class="hover:text-white">
-                                <i data-lucide="info" size="14"></i> História por trás das músicas
-                            </small>
-                        </div>
-                    </div>
-                    <div class="song-grid">
-                        ${section.songs.map(song => {
-                            const globalIndex = allSongs.findIndex(s => s.file === song.file);
-                            return `
-                                <div class="song-card" id="card-${globalIndex}">
-                                    <div class="song-header">
-                                        <div class="album-art" style="background: ${section.gradient}">
-                                            <i data-lucide="music"></i>
-                                            <div class="eq-bars">
-                                                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                                            </div>
-                                        </div>
-                                        <div class="song-info">
-                                            <div class="song-title">
-                                                ${song.title} 
-                                                ${song.isPrincipal ? '<i data-lucide="heart" size="12" class="text-accent" style="display:inline; fill:currentColor; margin-left:4px;"></i>' : ''}
-                                            </div>
-                                            <div class="song-meta">
-                                                <span>${song.duration}</span>
-                                                <span style="opacity:0.5">•</span>
-                                                <span>${section.profile}</span>
-                                            </div>
-                                        </div>
-                                        <div class="song-actions">
-                                            <button class="action-btn" title="Letra" onclick="toggleLyrics('lyrics-${globalIndex}')"><i data-lucide="mic-2" size="18"></i></button>
-                                            <button class="play-btn-small" onclick="playSong(${globalIndex})">
-                                                <i data-lucide="play" size="18" id="btn-icon-${globalIndex}"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="lyrics-panel" id="lyrics-${globalIndex}">
-                                        <div class="lyrics-content">
-                                            <strong style="color: var(--primary); text-transform:uppercase; font-size: 0.8rem; letter-spacing:1px; display:block; margin-bottom:1rem;">Letra da Música</strong>
-                                            (Verso 1)<br>
-                                            No compasso da inovação, a gente cria<br>
-                                            Com inteligência e alma, dia após dia...<br>
-                                            <br>
-                                            <em style="opacity:0.6">[Simulação de letra para ${song.title}]</em>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
+                sectionDiv.className = 'section-wrapper';
+                sectionDiv.innerHTML = createSectionHTML(section);
                 playlistContainer.appendChild(sectionDiv);
             });
 
-            // Start Carousel with Progress Sync
-            let currentSlide = 0;
+            // Start Carousel
+            startCarousel();
+
+            lucide.createIcons();
+            
+            // Inicializa Sticky Bar
+            updateStickyBar('album-guerreiros');
+            
+            // Setup Scroll Spy
+            window.addEventListener('scroll', onScrollSpy);
+        }
+
+        // --- CAROUSEL LOGIC ---
+        let slideInterval;
+        let currentSlide = 0;
+
+        function startCarousel() {
+            const slides = document.querySelectorAll('.hero-slide');
+            if (slides.length === 0) return;
+            
+            clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, CAROUSEL_INTERVAL);
+        }
+
+        function nextSlide() {
+            const slides = document.querySelectorAll('.hero-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            const progressFill = document.getElementById('carouselProgressFill');
+            
+            if(slides.length === 0) return;
+
+            // Reset Animation
+            if(progressFill) {
+                progressFill.style.animation = 'none';
+                progressFill.offsetHeight; 
+                progressFill.style.animation = `progressFill ${CAROUSEL_INTERVAL}ms linear infinite`;
+            }
+
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+
+        function goToSlide(n) {
             const slides = document.querySelectorAll('.hero-slide');
             const dots = document.querySelectorAll('.indicator-dot');
             const progressFill = document.getElementById('carouselProgressFill');
 
-            function nextSlide() {
-                // Remove Animation Class briefly to reset it
+            if(n === currentSlide) return;
+            
+            if(progressFill) {
                 progressFill.style.animation = 'none';
-                progressFill.offsetHeight; /* trigger reflow */
+                progressFill.offsetHeight; 
                 progressFill.style.animation = `progressFill ${CAROUSEL_INTERVAL}ms linear infinite`;
-
-                slides[currentSlide].classList.remove('active');
-                dots[currentSlide].classList.remove('active');
-                
-                currentSlide = (currentSlide + 1) % slides.length;
-                
-                slides[currentSlide].classList.add('active');
-                dots[currentSlide].classList.add('active');
             }
+            
+            clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, CAROUSEL_INTERVAL);
 
-            setInterval(nextSlide, CAROUSEL_INTERVAL);
-
-            // Re-render icons
-            lucide.createIcons();
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide = n;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
         }
 
-        // --- PLAYER LOGIC ---
-        function playSong(index) {
-            // Se clicar na mesma musica que está tocando
-            if (currentSongIndex === index) {
-                togglePlay();
-                return;
-            }
+        // Renderização HTML de uma seção (Reutilizável)
+        function createSectionHTML(section) {
+            return `
+                <div class="section-header">
+                    <div class="section-flag">${section.flag}</div>
+                    <div class="section-title">
+                        <h3>${section.profile} <span class="badge">${section.country}</span></h3>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <small style="color: #94a3b8; display:flex; align-items:center; gap:4px; margin-top:4px;">
+                                ${section.songs.length} faixas
+                            </small>
+                            <small style="color: #94a3b8; display:flex; align-items:center; gap:4px; cursor:pointer; transition:0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'" title="Ler a história">
+                                <i data-lucide="info" size="14"></i> História por trás das músicas
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="song-grid" id="grid-${section.id}">
+                    ${renderSongCards(section)}
+                </div>
+            `;
+        }
 
-            // Reset UI of previous song
-            if (currentSongIndex !== -1) {
-                const prevCard = document.getElementById(`card-${currentSongIndex}`);
-                const prevBtn = document.getElementById(`btn-icon-${currentSongIndex}`);
-                if(prevCard) prevCard.classList.remove('active', 'playing');
-                if(prevBtn) {
-                   prevBtn.setAttribute('data-lucide', 'play');
-                   lucide.createIcons({ root: prevBtn.parentElement }); 
+        function renderSongCards(section) {
+            if (section.songs.length === 0) {
+                return `<div style="text-align:center; padding: 3rem; color: #64748b; font-style:italic; grid-column: 1/-1; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                    <i data-lucide="heart-off" style="margin-bottom:10px; opacity:0.5"></i><br>
+                    Nenhuma música favoritada ainda.<br>
+                    <span style="font-size:0.8rem">Clique no coração das músicas para adicionar aqui.</span>
+                </div>`;
+            }
+            return section.songs.map((song, songIdx) => {
+                const domId = `${section.id}-${songIdx}`;
+                const isFav = userFavorites.has(song.file);
+                
+                // Icon fill logic
+                const fillAttr = isFav ? 'fill="currentColor"' : 'fill="none"';
+                const activeClass = isFav ? 'active' : '';
+                
+                // Star icon only for principals (Visual indicator only)
+                const starIcon = song.isPrincipal 
+                    ? '<i data-lucide="star" size="12" class="text-yellow" style="display:inline; fill:currentColor; margin-left:4px;"></i>' 
+                    : '';
+
+                return `
+                    <div class="song-card" id="card-${domId}">
+                        <div class="song-header">
+                            <div class="album-art" style="background: ${section.gradient}">
+                                <i data-lucide="music"></i>
+                                <div class="eq-bars">
+                                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                </div>
+                            </div>
+                            <div class="song-info">
+                                <div class="song-title">
+                                    ${song.title} 
+                                    ${starIcon}
+                                </div>
+                                <div class="song-meta">
+                                    <span>${song.duration}</span>
+                                    <span style="opacity:0.5">•</span>
+                                    <span>${song.displayContext || section.profile}</span>
+                                </div>
+                            </div>
+                            <div class="song-actions">
+                                <button class="action-btn fav-btn ${activeClass}" 
+                                        data-file="${song.file}"
+                                        title="Favoritar" 
+                                        onclick="toggleFavorite('${song.file}')">
+                                    <i data-lucide="heart" size="18" ${fillAttr}></i>
+                                </button>
+                                <button class="action-btn" title="Letra" onclick="toggleLyrics('lyrics-${domId}')">
+                                    <i data-lucide="mic-2" size="18"></i>
+                                </button>
+                                <button class="play-btn-small" onclick="playSpecificContext('${section.id}', ${songIdx})">
+                                    <i data-lucide="play" size="18" id="btn-icon-${domId}"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="lyrics-panel" id="lyrics-${domId}">
+                            <div class="lyrics-content">
+                                <strong style="color: var(--primary); text-transform:uppercase; font-size: 0.8rem; letter-spacing:1px; display:block; margin-bottom:1rem;">Letra da Música</strong>
+                                (Verso 1)<br>
+                                [Letra simulada para ${song.title}]...<br>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- SCROLL SPY LOGIC ---
+        function onScrollSpy() {
+            const wrappers = document.querySelectorAll('.section-wrapper');
+            let currentSectionId = '';
+            const offset = 180; 
+
+            wrappers.forEach(wrapper => {
+                const top = wrapper.getBoundingClientRect().top;
+                if (top < window.innerHeight / 2) {
+                    currentSectionId = wrapper.id;
                 }
+            });
+
+            if (currentSectionId) {
+                updateStickyBar(currentSectionId);
             }
+        }
 
-            currentSongIndex = index;
-            const song = allSongs[index];
+        function updateStickyBar(sectionId) {
+            const sectionData = sections.find(s => s.id === sectionId);
+            if (!sectionData) return;
 
-            // Update Audio Source (PATH CONFIG HERE)
-            // IMPORTANTE: Assumindo que os arquivos estao numa pasta chamada 'musicas'
-            audio.src = `musicas/${song.file}`; 
+            const titleEl = document.getElementById('stickyTitle');
+            const countEl = document.getElementById('stickyCount');
             
-            // Update Sticky Player UI
+            titleEl.innerHTML = `
+                ${sectionData.profile} 
+                <span style="opacity:0.5; font-weight:400; font-size:0.9rem; margin-left:4px;">[${sectionData.country}]</span>
+                <button class="sticky-play-btn" onclick="playSection('${sectionData.id}')" title="Tocar todas as músicas da seção: ${sectionData.profile}">
+                    <i data-lucide="play" size="14"></i>
+                </button>
+            `;
+            
+            countEl.innerText = `${sectionData.songs.length} faixas`;
+            lucide.createIcons({ root: titleEl });
+        }
+
+        // --- PLAYBACK LOGIC ---
+
+        function playAllSongs() {
+            playQueue = allPlayableSongs.map(s => ({...s, domId: null}));
+            currentSongIndex = 0;
+            loadAndPlay();
+        }
+
+        function playSection(sectionId) {
+            const section = sections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            playQueue = section.songs.map((s, idx) => ({
+                ...s,
+                sectionName: section.profile,
+                sectionGradient: section.gradient,
+                flag: section.flag,
+                domId: `${sectionId}-${idx}` 
+            }));
+            currentSongIndex = 0;
+            loadAndPlay();
+        }
+
+        function playSpecificContext(sectionId, songIndex) {
+            const section = sections.find(s => s.id === sectionId);
+            playQueue = section.songs.map((s, idx) => ({
+                ...s,
+                sectionName: section.profile,
+                sectionGradient: section.gradient,
+                flag: section.flag,
+                domId: `${sectionId}-${idx}`
+            }));
+            currentSongIndex = songIndex;
+            loadAndPlay();
+        }
+
+        function loadAndPlay() {
+            if (currentSongIndex < 0 || currentSongIndex >= playQueue.length) return;
+            
+            const song = playQueue[currentSongIndex];
+            
+            // Reset UI previous
+            document.querySelectorAll('.song-card.active').forEach(el => el.classList.remove('active', 'playing'));
+            document.querySelectorAll('.play-btn-small i').forEach(el => {
+                el.setAttribute('data-lucide', 'play');
+            });
+            lucide.createIcons();
+
+            // Set Audio
+            audio.src = `musicas/${song.file}`;
+            
+            // Update Sticky Player
             document.getElementById('playerTitle').innerText = song.title;
             document.getElementById('playerMeta').innerHTML = `${song.sectionName} <span style="opacity:0.5">•</span> ${song.flag}`;
             document.getElementById('playerArt').style.background = song.sectionGradient;
             document.getElementById('playerBar').classList.add('visible');
 
+            // Highlight List Item
+            if (song.domId) {
+                const card = document.getElementById(`card-${song.domId}`);
+                if (card) {
+                    card.classList.add('active', 'playing');
+                    const icon = card.querySelector(`#btn-icon-${song.domId}`);
+                    if(icon) icon.setAttribute('data-lucide', 'pause');
+                    lucide.createIcons({ root: card });
+                }
+            }
+
             audio.play().then(() => {
                 isPlaying = true;
-                updateUIState();
-            }).catch(e => console.log("Erro playback (user must interact first):", e));
+                updateGlobalPlayButton();
+            }).catch(e => console.log(e));
         }
 
         function togglePlay() {
-            if (currentSongIndex === -1) return;
-
             if (audio.paused) {
                 audio.play();
                 isPlaying = true;
@@ -818,68 +1288,59 @@
                 audio.pause();
                 isPlaying = false;
             }
-            updateUIState();
+            updateGlobalPlayButton();
+            
+            const song = playQueue[currentSongIndex];
+            if(song && song.domId) {
+                const card = document.getElementById(`card-${song.domId}`);
+                if(card) {
+                    const icon = card.querySelector(`#btn-icon-${song.domId}`);
+                    if(isPlaying) {
+                        card.classList.add('playing');
+                        if(icon) icon.setAttribute('data-lucide', 'pause');
+                    } else {
+                        card.classList.remove('playing');
+                        if(icon) icon.setAttribute('data-lucide', 'play');
+                    }
+                    lucide.createIcons({ root: card });
+                }
+            }
         }
 
-        function nextSong() {
-            if (currentSongIndex === -1) return;
-            const next = (currentSongIndex + 1) % allSongs.length;
-            playSong(next);
-        }
-
-        function prevSong() {
-            if (currentSongIndex === -1) return;
-            const prev = (currentSongIndex - 1 + allSongs.length) % allSongs.length;
-            playSong(prev);
-        }
-
-        function updateUIState() {
-            // Update Sticky Button
+        function updateGlobalPlayButton() {
             const mainIcon = document.getElementById('playIconMain');
             mainIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
             lucide.createIcons({ root: mainIcon.parentElement });
-
-            // Update List Item
-            const card = document.getElementById(`card-${currentSongIndex}`);
-            const btnIcon = document.getElementById(`btn-icon-${currentSongIndex}`);
-            
-            if (card) {
-                if (isPlaying) card.classList.add('playing');
-                else card.classList.remove('playing');
-                
-                card.classList.add('active'); // Always active if selected
-            }
-
-            if (btnIcon) {
-                btnIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
-                lucide.createIcons({ root: btnIcon.parentElement });
-            }
         }
 
-        // Progress Bar Update
-        audio.ontimeupdate = () => {
-            const pct = (audio.currentTime / audio.duration) * 100;
-            document.getElementById('progressBar').style.width = pct + '%';
-        };
-
-        audio.onended = nextSong;
-
-        function seekAudio(e) {
-            const width = e.target.clientWidth;
-            const clickX = e.offsetX;
-            const duration = audio.duration;
-            audio.currentTime = (clickX / width) * duration;
+        function nextSong() {
+            if (playQueue.length === 0) return;
+            currentSongIndex = (currentSongIndex + 1) % playQueue.length;
+            loadAndPlay();
         }
 
-        // --- UI HELPERS ---
+        function prevSong() {
+            if (playQueue.length === 0) return;
+            currentSongIndex = (currentSongIndex - 1 + playQueue.length) % playQueue.length;
+            loadAndPlay();
+        }
+        
+        function shuffleSongs() {
+            for (let i = playQueue.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [playQueue[i], playQueue[j]] = [playQueue[j], playQueue[i]];
+            }
+            currentSongIndex = 0;
+            loadAndPlay();
+        }
+
+        // Helpers
         function toggleMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('active');
+            document.getElementById('mobileMenu').classList.toggle('active');
         }
 
         function toggleLyrics(id) {
             const panel = document.getElementById(id);
-            // Fechar outros
             document.querySelectorAll('.lyrics-panel').forEach(p => {
                 if(p.id !== id) p.classList.remove('open');
             });
@@ -888,17 +1349,25 @@
 
         function scrollToSection(id) {
             const el = document.getElementById(id);
-            const headerOffset = 80;
+            const headerOffset = 160; 
             const elementPosition = el.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          
-            window.scrollTo({
-                 top: offsetPosition,
-                 behavior: "smooth"
-            });
+            window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        }
+        
+        function seekAudio(e) {
+            const width = e.target.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
         }
 
-        // Init
+        audio.ontimeupdate = () => {
+            const pct = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+        };
+        audio.onended = nextSong;
+
         window.addEventListener('DOMContentLoaded', init);
 
     </script>
