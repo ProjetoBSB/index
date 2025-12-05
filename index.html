@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto BSB - BRICS Street Boys</title>
+    
+    <!-- Importando Ícones Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* --- RESET & VARIAVEIS --- */
+        :root {
+            --bg-dark: #0f172a;      /* slate-900 */
+            --bg-card: #1e293b;      /* slate-800 */
+            --bg-card-hover: #334155; /* slate-700 */
+            --text-main: #f1f5f9;    /* slate-100 */
+            --text-muted: #94a3b8;   /* slate-400 */
+            --primary: #6366f1;      /* indigo-500 */
+            --primary-hover: #4f46e5; /* indigo-600 */
+            --accent: #a855f7;       /* purple-500 */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding-bottom: 120px; /* Espaço para o player */
+            scroll-behavior: smooth;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.2s; }
+        ul { list-style: none; }
+
+        /* --- HEADER --- */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1e293b;
+            z-index: 100;
+            height: 64px;
+            display: flex;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
+        .nav-links a:hover { color: white; }
+
+        /* Mobile Menu */
+        .mobile-toggle { display: none; background: none; border: none; color: white; cursor: pointer; }
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 64px; left: 0; right: 0;
+            background: var(--bg-card);
+            border-bottom: 1px solid #334155;
+            flex-direction: column;
+            padding: 1rem;
+        }
+        .mobile-menu.active { display: flex; }
+        .mobile-menu a { padding: 0.75rem 0; border-bottom: 1px solid #334155; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-toggle { display: block; }
+        }
+
+        /* --- HERO / CAROUSEL --- */
+        #hero {
+            height: 50vh;
+            min-height: 400px;
+            position: relative;
+            margin-top: 64px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 1;
+            padding: 1rem;
+        }
+        
+        .hero-slide.active { opacity: 1; z-index: 2; }
+        
+        /* Overlay padrão para legibilidade */
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: -1;
+        }
+
+        .hero-flag { font-size: 4rem; margin-bottom: 1rem; animation: bounce 3s infinite; }
+        .hero-title { font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem; text-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .hero-desc { font-size: 1.2rem; color: rgba(255,255,255,0.9); max-width: 600px; margin-bottom: 2rem; }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .btn-glass { background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); color: white; border: 1px solid rgba(255,255,255,0.4); }
+        .btn-white { background: white; color: var(--bg-dark); }
+        .btn-primary { background: var(--primary); color: white; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* --- PLAYLIST BAR --- */
+        .playlist-bar {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 64px;
+            z-index: 90;
+            padding: 1rem 0;
+            border-bottom: 1px solid #334155;
+            border-top: 1px solid #334155;
+        }
+
+        /* --- SECTIONS --- */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 1rem;
+            margin-top: 3rem;
+        }
+        .section-flag { font-size: 2.5rem; }
+        .section-title h3 { font-size: 1.5rem; color: white; display: flex; align-items: center; gap: 0.5rem; }
+        .badge { font-size: 0.8rem; background: var(--bg-card); padding: 0.2rem 0.5rem; border-radius: 4px; color: var(--text-muted); font-weight: normal; }
+
+        /* --- SONG LIST --- */
+        .song-grid { display: grid; gap: 0.75rem; }
+        
+        .song-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid transparent;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .song-card:hover { background: var(--bg-card); border-color: rgba(99, 102, 241, 0.3); }
+
+        .song-header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            gap: 1rem;
+        }
+
+        /* Icon Animation Logic */
+        .album-art {
+            width: 40px; height: 40px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
+            background-size: cover;
+            position: relative;
+            flex-shrink: 0;
+            color: white;
+        }
+        /* Expand on hover or active */
+        .song-card:hover .album-art, .song-card.active .album-art {
+            width: 64px; height: 64px;
+        }
+        
+        /* EQ Animation bars */
+        .eq-bars { display: none; align-items: flex-end; gap: 2px; height: 20px; position: absolute; bottom: 8px; }
+        .bar { width: 4px; background: white; animation: eq 1s infinite ease-in-out; }
+        .bar:nth-child(2) { animation-delay: 0.1s; height: 15px; }
+        .bar:nth-child(3) { animation-delay: 0.2s; height: 10px; }
+        .song-card.active.playing .eq-bars { display: flex; }
+
+        @keyframes eq {
+            0%, 100% { height: 5px; }
+            50% { height: 15px; }
+        }
+
+        .song-info { flex-grow: 1; min-width: 0; }
+        .song-title { font-weight: 500; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .song-card.active .song-title { color: var(--primary); }
+        .song-meta { font-size: 0.8rem; color: var(--text-muted); }
+
+        .song-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .action-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 50%; transition: 0.2s; }
+        .action-btn:hover { color: white; background: var(--bg-card-hover); }
+        .play-btn-small { 
+            width: 40px; height: 40px; 
+            border-radius: 50%; 
+            background: var(--bg-card-hover); 
+            color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            border: none; cursor: pointer; transition: 0.2s;
+        }
+        .song-card.active .play-btn-small { background: var(--primary); color: white; }
+        .song-card:hover .play-btn-small:hover { background: white; color: var(--primary); }
+
+        /* Lyrics Accordion */
+        .lyrics-panel {
+            max-height: 0;
+            overflow: hidden;
+            background: rgba(15, 23, 42, 0.5);
+            transition: max-height 0.5s ease-in-out;
+        }
+        .lyrics-panel.open { max-height: 500px; /* valor arbitrário alto suficiente */ }
+        .lyrics-content { padding: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* --- ABOUT --- */
+        #about { background: var(--bg-card); padding: 4rem 0; margin-top: 4rem; }
+        .about-content { display: flex; flex-direction: column; align-items: center; gap: 2rem; text-align: center; }
+        @media(min-width: 768px) { 
+            .about-content { flex-direction: row; text-align: left; } 
+        }
+        .avatar { width: 200px; height: 200px; background: #475569; border-radius: 50%; border: 4px solid var(--primary); display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+
+        /* --- STICKY PLAYER --- */
+        .player-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--bg-dark);
+            border-top: 1px solid #334155;
+            padding: 0.75rem 1rem;
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 200;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+        .player-bar.visible { transform: translateY(0); }
+
+        .player-info { display: flex; align-items: center; gap: 1rem; width: 30%; }
+        .player-art { width: 48px; height: 48px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; }
+        .player-controls { display: flex; align-items: center; gap: 1rem; }
+        .ctrl-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; }
+        .ctrl-btn:hover { color: white; }
+        .play-main { width: 48px; height: 48px; background: white; border-radius: 50%; color: black; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .play-main:hover { transform: scale(1.1); }
+        
+        .progress-bar-container { position: absolute; top: -2px; left: 0; width: 100%; height: 2px; background: #334155; cursor: pointer;}
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.1s linear; }
+
+        /* Utilitários */
+        .hidden { display: none !important; }
+        .text-primary { color: var(--primary); }
+        .text-yellow { color: #facc15; }
+
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">B</div>
+                <span>Projeto <span class="text-primary">BSB</span></span>
+            </div>
+            
+            <button class="mobile-toggle" onclick="toggleMenu()"><i data-lucide="menu"></i></button>
+
+            <div class="nav-links">
+                <a href="#home">Início</a>
+                <a href="#playlist">Playlist</a>
+                <a href="#clips">Clipes</a>
+                <a href="#about">Sobre</a>
+            </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#home" onclick="toggleMenu()">Início</a>
+            <a href="#playlist" onclick="toggleMenu()">Playlist</a>
+            <a href="#clips" onclick="toggleMenu()">Clipes</a>
+            <a href="#about" onclick="toggleMenu()">Sobre</a>
+        </div>
+    </nav>
+
+    <!-- HERO CAROUSEL -->
+    <section id="hero">
+        <!-- Slides inseridos via JS -->
+    </section>
+
+    <!-- PLAYLIST CONTROLS -->
+    <div class="playlist-bar">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="list-music" class="text-primary"></i>
+                <h2 style="font-size: 1.25rem; font-weight: bold;">Playlist Oficial</h2>
+                <span id="totalSongs" style="font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; padding: 2px 8px; border-radius: 99px;">0 faixas</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-primary" onclick="playSong(0)">
+                    <i data-lucide="play" style="width: 16px;"></i> Tocar Tudo
+                </button>
+                <button class="btn btn-glass" style="background: #334155;" onclick="shuffleSongs()">
+                    <i data-lucide="shuffle" style="width: 16px;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="playlist" class="container" style="padding-top: 1rem;">
+        <!-- Seções inseridas via JS -->
+    </div>
+
+    <!-- ABOUT -->
+    <section id="about">
+        <div class="container about-content">
+            <div class="avatar">
+                <i data-lucide="user" size="64"></i>
+            </div>
+            <div>
+                <h2 style="font-size: 2rem; margin-bottom: 1rem; font-weight: bold;">Sobre o Projeto BSB</h2>
+                <div style="width: 60px; height: 4px; background: var(--primary); margin-bottom: 1.5rem;"></div>
+                <p style="color: #cbd5e1; line-height: 1.8; margin-bottom: 1rem;">
+                    O <strong>Projeto BRICS Street Boys (BSB)</strong> nasceu da fusão entre tecnologia e cultura. 
+                    Utilizando o que há de mais moderno em Inteligência Artificial Generativa, criamos uma identidade musical 
+                    única para cada perfil do IPEA, conectando as nações do BRICS através de melodias, ritmos e dados.
+                </p>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button class="action-btn" style="background: #334155;"><i data-lucide="share-2"></i></button>
+                    <button class="action-btn" style="background: #334155;"><i data-lucide="heart"></i></button>
+                    <button class="action-btn" style="background: #334155;"><i data-lucide="globe"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PLAYER FIXO -->
+    <div class="player-bar" id="playerBar">
+        <div class="progress-bar-container" onclick="seekAudio(event)">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="player-info">
+            <div class="player-art" id="playerArt" style="background: linear-gradient(to bottom right, #4f46e5, #ec4899);">
+                <i data-lucide="music" color="white"></i>
+            </div>
+            <div style="overflow: hidden;">
+                <div id="playerTitle" style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Selecione uma música</div>
+                <div id="playerMeta" style="font-size: 0.8rem; color: #94a3b8;">Projeto BSB</div>
+            </div>
+        </div>
+
+        <div class="player-controls">
+            <button class="ctrl-btn" onclick="prevSong()"><i data-lucide="skip-back"></i></button>
+            <button class="play-main" onclick="togglePlay()">
+                <i data-lucide="play" id="playIconMain"></i>
+            </button>
+            <button class="ctrl-btn" onclick="nextSong()"><i data-lucide="skip-forward"></i></button>
+        </div>
+
+        <div class="player-controls" style="display: none; @media(min-width: 640px){ display: flex; }">
+            <button class="ctrl-btn"><i data-lucide="mic-2"></i></button>
+        </div>
+    </div>
+
+    <!-- AUDIO ELEMENT -->
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        // --- DADOS ---
+        const sections = [
+            {
+                id: 'comunicacao', profile: 'Comunicação', country: 'Brasil', flag: '🇧🇷',
+                gradient: 'linear-gradient(135deg, #16a34a, #eab308)', // Green to Yellow
+                desc: 'A voz que conecta e informa.',
+                songs: [
+                    { title: 'Samba da Comunicação (Bossa v2)', file: 'SAMBAD~3.MP3', duration: '3:45' },
+                    { title: 'Samba da Comunicação (Bossa v1) Principal', file: 'SA9AF6~1.MP3', duration: '4:10', isPrincipal: true },
+                    { title: 'Samba da Comunicação (1x)', file: 'SAMBAD~1.MP3', duration: '3:20' }
+                ]
+            },
+            {
+                id: 'editorial', profile: 'Editorial', country: 'Rússia', flag: '🇷🇺',
+                gradient: 'linear-gradient(135deg, #dc2626, #2563eb)', // Red to Blue
+                desc: 'A precisão na escrita e na história.',
+                songs: [
+                    { title: 'Lapidando Histórias (Edit) Principal', file: 'LAPIDA~4.MP3', duration: '4:05', isPrincipal: true },
+                    { title: 'Lapidando Histórias (Ópera Russa)', file: 'LA67B6~1.MP3', duration: '4:15' }
+                ]
+            },
+            {
+                id: 'gestao', profile: 'Gestão', country: 'China', flag: '🇨🇳',
+                gradient: 'linear-gradient(135deg, #ef4444, #facc15)', // Red to Yellow
+                desc: 'Organização e eficiência em cada peça.',
+                songs: [
+                    { title: 'Peça por Peça Big (Gestao)', file: 'PEAAPE~1.MP3', duration: '3:12' }
+                ]
+            },
+            {
+                id: 'avaliacao', profile: 'PP Avaliação', country: 'África do Sul', flag: '🇿🇦',
+                gradient: 'linear-gradient(135deg, #eab308, #16a34a)', // Yellow to Green
+                desc: 'Avaliar é curar.',
+                songs: [
+                    { title: 'Avaliar é Curar (Yebo Sabela Mix)', file: 'AVALIA~1.MP3', duration: '3:45' }
+                ]
+            },
+            {
+                id: 'guerreiros', profile: 'Guerreiros da Nação', country: 'BRICS', flag: '🌐',
+                gradient: 'linear-gradient(135deg, #2563eb, #9333ea)', // Blue to Purple
+                desc: 'A força conjunta das nações.',
+                songs: [
+                    { title: 'Guerreiros da Nação CLIPE Principal', file: 'GU054F~1.MP3', duration: '4:30', isPrincipal: true },
+                    { title: 'Guerreiros da Nação (Coral)', file: 'GU051A~1.MP3', duration: '4:00' }
+                ]
+            }
+        ];
+
+        // Flatten songs array for easier playback logic
+        let allSongs = [];
+        sections.forEach(section => {
+            section.songs.forEach(song => {
+                allSongs.push({
+                    ...song,
+                    sectionName: section.profile,
+                    sectionGradient: section.gradient,
+                    flag: section.flag
+                });
+            });
+        });
+
+        // --- STATE ---
+        let currentSongIndex = -1;
+        let isPlaying = false;
+        const audio = document.getElementById('audioPlayer');
+
+        // --- RENDER ---
+        function init() {
+            // Render Hero Carousel Slides
+            const heroContainer = document.getElementById('hero');
+            const playlistContainer = document.getElementById('playlist');
+            
+            document.getElementById('totalSongs').innerText = allSongs.length + ' faixas';
+
+            sections.forEach((section, idx) => {
+                // Hero Slide
+                const slide = document.createElement('div');
+                slide.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
+                slide.style.background = section.gradient;
+                slide.innerHTML = `
+                    <div class="hero-overlay"></div>
+                    <div class="hero-flag">${section.flag}</div>
+                    <h1 class="hero-title">${section.profile}</h1>
+                    <p class="hero-desc">${section.desc}</p>
+                    <div style="display:flex; gap: 1rem;">
+                        <button class="btn btn-glass" onclick="scrollToSection('${section.id}')">
+                            <i data-lucide="music"></i> Ver Músicas
+                        </button>
+                        <button class="btn btn-white">
+                            <i data-lucide="user"></i> Perfil IPEA
+                        </button>
+                    </div>
+                `;
+                heroContainer.appendChild(slide);
+
+                // Playlist Section
+                const sectionDiv = document.createElement('div');
+                sectionDiv.id = section.id;
+                sectionDiv.innerHTML = `
+                    <div class="section-header">
+                        <div class="section-flag">${section.flag}</div>
+                        <div class="section-title">
+                            <h3>${section.profile} <span class="badge">${section.country}</span></h3>
+                            <small style="color: #94a3b8; display:flex; align-items:center; gap:4px; margin-top:4px;">
+                                <i data-lucide="info" size="14"></i> História por trás das músicas
+                            </small>
+                        </div>
+                    </div>
+                    <div class="song-grid">
+                        ${section.songs.map(song => {
+                            const globalIndex = allSongs.findIndex(s => s.file === song.file);
+                            return `
+                                <div class="song-card" id="card-${globalIndex}">
+                                    <div class="song-header">
+                                        <div class="album-art" style="background: ${section.gradient}">
+                                            <i data-lucide="music"></i>
+                                            <div class="eq-bars">
+                                                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                            </div>
+                                        </div>
+                                        <div class="song-info">
+                                            <div class="song-title">
+                                                ${song.title} 
+                                                ${song.isPrincipal ? '<i data-lucide="heart" size="12" class="text-yellow" style="display:inline; fill:currentColor"></i>' : ''}
+                                            </div>
+                                            <div class="song-meta">${song.duration} • ${section.profile}</div>
+                                        </div>
+                                        <div class="song-actions">
+                                            <button class="action-btn" title="Letra" onclick="toggleLyrics('lyrics-${globalIndex}')"><i data-lucide="mic-2" size="18"></i></button>
+                                            <button class="play-btn-small" onclick="playSong(${globalIndex})">
+                                                <i data-lucide="play" size="18" id="btn-icon-${globalIndex}"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="lyrics-panel" id="lyrics-${globalIndex}">
+                                        <div class="lyrics-content">
+                                            <strong>Letra da Música</strong><br><br>
+                                            (Verso 1)<br>
+                                            Inovação que gera o futuro...<br>
+                                            <em style="opacity:0.6">[Simulação de letra]</em>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                playlistContainer.appendChild(sectionDiv);
+            });
+
+            // Start Carousel
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.hero-slide');
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 8000);
+
+            // Re-render icons
+            lucide.createIcons();
+        }
+
+        // --- PLAYER LOGIC ---
+        function playSong(index) {
+            // Se clicar na mesma musica que está tocando
+            if (currentSongIndex === index) {
+                togglePlay();
+                return;
+            }
+
+            // Reset UI of previous song
+            if (currentSongIndex !== -1) {
+                const prevCard = document.getElementById(`card-${currentSongIndex}`);
+                const prevBtn = document.getElementById(`btn-icon-${currentSongIndex}`);
+                if(prevCard) prevCard.classList.remove('active', 'playing');
+                if(prevBtn) {
+                   prevBtn.setAttribute('data-lucide', 'play');
+                   lucide.createIcons({ root: prevBtn.parentElement }); 
+                }
+            }
+
+            currentSongIndex = index;
+            const song = allSongs[index];
+
+            // Update Audio Source (PATH CONFIG HERE)
+            // IMPORTANTE: Assumindo que os arquivos estao numa pasta chamada 'musicas'
+            audio.src = `musicas/${song.file}`; 
+            
+            // Update Sticky Player UI
+            document.getElementById('playerTitle').innerText = song.title;
+            document.getElementById('playerMeta').innerText = `${song.sectionName} • ${song.flag}`;
+            document.getElementById('playerArt').style.background = song.sectionGradient;
+            document.getElementById('playerBar').classList.add('visible');
+
+            audio.play().then(() => {
+                isPlaying = true;
+                updateUIState();
+            }).catch(e => console.log("Erro playback (user must interact first):", e));
+        }
+
+        function togglePlay() {
+            if (currentSongIndex === -1) return;
+
+            if (audio.paused) {
+                audio.play();
+                isPlaying = true;
+            } else {
+                audio.pause();
+                isPlaying = false;
+            }
+            updateUIState();
+        }
+
+        function nextSong() {
+            if (currentSongIndex === -1) return;
+            const next = (currentSongIndex + 1) % allSongs.length;
+            playSong(next);
+        }
+
+        function prevSong() {
+            if (currentSongIndex === -1) return;
+            const prev = (currentSongIndex - 1 + allSongs.length) % allSongs.length;
+            playSong(prev);
+        }
+
+        function updateUIState() {
+            // Update Sticky Button
+            const mainIcon = document.getElementById('playIconMain');
+            mainIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
+            lucide.createIcons({ root: mainIcon.parentElement });
+
+            // Update List Item
+            const card = document.getElementById(`card-${currentSongIndex}`);
+            const btnIcon = document.getElementById(`btn-icon-${currentSongIndex}`);
+            
+            if (card) {
+                if (isPlaying) card.classList.add('playing');
+                else card.classList.remove('playing');
+                
+                card.classList.add('active'); // Always active if selected
+            }
+
+            if (btnIcon) {
+                btnIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
+                lucide.createIcons({ root: btnIcon.parentElement });
+            }
+        }
+
+        // Progress Bar Update
+        audio.ontimeupdate = () => {
+            const pct = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+        };
+
+        audio.onended = nextSong;
+
+        function seekAudio(e) {
+            const width = e.target.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        }
+
+        // --- UI HELPERS ---
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+
+        function toggleLyrics(id) {
+            const panel = document.getElementById(id);
+            // Fechar outros
+            document.querySelectorAll('.lyrics-panel').forEach(p => {
+                if(p.id !== id) p.classList.remove('open');
+            });
+            panel.classList.toggle('open');
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView();
+        }
+
+        // Init
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
