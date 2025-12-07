@@ -137,7 +137,7 @@
             inset: 0; 
             backdrop-filter: blur(0px); 
             z-index: -1; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.0) 33%, rgba(0,0,0,0.7) 100%); 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.0) 33%, rgba(0,0,0,0.8) 100%); 
         }
         
         .hero-texture { position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 50px 50px; z-index: 0; pointer-events: none;}
@@ -585,7 +585,10 @@
             // Note: This often requires CORS enabled server or local file access
             // Wrapped in try/catch for safety
             try {
-                jsmediatags.read(url, {
+                // Ensure absolute URL and correct encoding
+                const absoluteUrl = new URL(url, document.baseURI).href;
+                
+                jsmediatags.read(absoluteUrl, {
                     onSuccess: function(tag) {
                         const tags = tag.tags;
                         if (tags.picture) {
@@ -606,7 +609,7 @@
                         }
                     },
                     onError: function(error) {
-                        // console.log("Meta read error:", error);
+                         // console.log("Meta read error:", error);
                     }
                 });
             } catch(e) {
@@ -813,7 +816,9 @@
             // Try to extract metadata for player
              if (typeof jsmediatags !== 'undefined') {
                 try {
-                    jsmediatags.read(song.file, {
+                    // Use absolute URL for player too
+                    const absoluteUrl = new URL(song.file, document.baseURI).href;
+                    jsmediatags.read(absoluteUrl, {
                         onSuccess: function(tag) {
                             const tags = tag.tags;
                             if (tags.picture) {
@@ -830,6 +835,12 @@
                     });
                 } catch(e){}
              }
+             
+             // Fallback for player art if extraction fails or takes too long: use section flag/logo if available
+             // (Logic: if extraction works, it overwrites this quickly. If fails, user sees flag)
+             // Actually, let's set a timeout fallback if extraction is slow? No, simple:
+             // If we have a countryCode image (flag), we can use it as placeholder in player too.
+             // But let's stick to current behavior unless requested.
 
             document.getElementById('playerTitle').innerText = song.title;
             document.getElementById('playerMeta').innerText = `${song.sectionName} • ${song.flag}`;
