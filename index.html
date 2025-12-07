@@ -11,7 +11,7 @@
     <!-- Importando Ícones Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Importando jsmediatags para ler capas de MP3 -->
+    <!-- Importando jsmediatags para capas de MP3 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
     
     <!-- Fontes Google -->
@@ -56,11 +56,36 @@
         .logo { display: flex; align-items: baseline; gap: 6px; text-decoration: none; }
         .logo-text-serif { font-family: 'Merriweather', serif; font-weight: 700; font-size: 1.8rem; color: white; letter-spacing: -0.5px; }
         .logo-text-block {
-            font-family: 'Inter', sans-serif; font-weight: 900; font-size: 2rem;
-            background: linear-gradient(135deg, #818cf8, #c084fc);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; letter-spacing: -1px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            /* Gradiente ajustado */
+            background: linear-gradient(
+                110deg, 
+                #6366f1 20%, 
+                #a855f7 40%, 
+                #ffffff 50%, 
+                #a855f7 60%, 
+                #6366f1 80%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            /* Brilho/Glow externo */
+            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
+            /* Animação mais lenta (6s) */
+            animation: energyFlow 6s linear infinite;
         }
+
+        @keyframes energyFlow {
+            to {
+                /* Valor negativo inverte a direção para esquerda -> direita */
+                background-position: -200% center;
+            }
+        }
+
         .nav-links { display: flex; gap: 2rem; position: relative; }
         .nav-item { position: relative; }
         .nav-links > .nav-item > a { 
@@ -107,7 +132,6 @@
             overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center;
             touch-action: pan-y; user-select: none;
         }
-        /* Wrapper para garantir ordem correta dos slides no DOM */
         #hero-slides-container {
             position: absolute; inset: 0; z-index: 5;
         }
@@ -121,7 +145,7 @@
         
         .hero-content {
             position: relative;
-            z-index: 30; /* Garante que fique acima de tudo */
+            z-index: 30; /* Acima da zona de pausa */
             text-align: center;
             width: 100%;
             display: flex;
@@ -131,13 +155,13 @@
 
         .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); z-index: -1; }
         
-        /* Ajuste de opacidade: 1/3 transparente (0% a 33%), depois escurece até 80% */
+        /* Gradiente: 1/3 transparente, depois escurece */
         .hero-overlay-dark { 
             position: absolute; 
             inset: 0; 
             backdrop-filter: blur(0px); 
             z-index: -1; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.0) 33%, rgba(0,0,0,0.8) 100%); 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.0) 33%, rgba(0,0,0,0.7) 100%); 
         }
         
         .hero-texture { position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 50px 50px; z-index: 0; pointer-events: none;}
@@ -177,8 +201,7 @@
         .nav-zone.right:hover { background: linear-gradient(to left, rgba(0,0,0,0.3), transparent); }
         .nav-zone.left { left: 0; }
         .nav-zone.right { right: 0; }
-        /* Removed pause-zone so clicks can reach buttons */
-
+        
         .carousel-progress-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(255,255,255,0.1); width: 100%; z-index: 10; }
         .carousel-progress-fill { height: 100%; background: var(--accent); width: 0; }
         .carousel-progress-fill.animating { animation: progressFill 8s linear; } 
@@ -232,7 +255,6 @@
         .song-header { display: flex; align-items: center; padding: 0.5rem 0.75rem; gap: 0.75rem; }
         
         .album-art { width: 42px; height: 42px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); background-size: cover; position: relative; flex-shrink: 0; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); overflow: hidden; }
-        /* Image inside album-art for lazy loading */
         .album-art img { width: 100%; height: 100%; object-fit: cover; display: none; }
         
         .song-card:hover .album-art, .song-card.active .album-art { width: 50px; height: 50px; box-shadow: 0 8px 15px rgba(0,0,0,0.3); }
