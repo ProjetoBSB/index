@@ -75,8 +75,8 @@
             letter-spacing: -1px;
             /* Brilho/Glow externo */
             filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
-            /* Animação mais lenta (6s) */
-            animation: energyFlow 6s linear infinite;
+            /* Animação mais lenta (10s) */
+            animation: energyFlow 10s linear infinite;
         }
 
         @keyframes energyFlow {
@@ -132,6 +132,7 @@
             overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center;
             touch-action: pan-y; user-select: none;
         }
+        /* Wrapper para garantir ordem correta dos slides no DOM */
         #hero-slides-container {
             position: absolute; inset: 0; z-index: 5;
         }
@@ -201,7 +202,8 @@
         .nav-zone.right:hover { background: linear-gradient(to left, rgba(0,0,0,0.3), transparent); }
         .nav-zone.left { left: 0; }
         .nav-zone.right { right: 0; }
-        
+        /* Removed pause-zone so clicks can reach buttons */
+
         .carousel-progress-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(255,255,255,0.1); width: 100%; z-index: 10; }
         .carousel-progress-fill { height: 100%; background: var(--accent); width: 0; }
         .carousel-progress-fill.animating { animation: progressFill 8s linear; } 
