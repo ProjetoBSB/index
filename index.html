@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     <title>Projeto BSB - BRICS Street Boys</title>
     
     <!-- Favicon -->
@@ -55,35 +56,33 @@
         .flex-container { display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: baseline; gap: 6px; text-decoration: none; }
         .logo-text-serif { font-family: 'Merriweather', serif; font-weight: 700; font-size: 1.8rem; color: white; letter-spacing: -0.5px; }
+        
         .logo-text-block {
             font-family: 'Inter', sans-serif;
             font-weight: 900;
             font-size: 2rem;
-            /* Gradiente ajustado */
+            /* Gradiente BEM mais claro para contraste no dark mode mobile */
             background: linear-gradient(
                 110deg, 
-                #6366f1 20%, 
-                #a855f7 40%, 
+                #a5b4fc 20%,  /* Indigo 300 */
+                #e9d5ff 40%,  /* Purple 200 */
                 #ffffff 50%, 
-                #a855f7 60%, 
-                #6366f1 80%
+                #e9d5ff 60%, 
+                #a5b4fc 80%
             );
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -1px;
-            /* Brilho/Glow externo */
-            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
-            /* Animação mais lenta (10s) */
+            /* Glow externo mais forte e claro */
+            filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.9));
+            /* Animação lenta */
             animation: energyFlow 10s linear infinite;
         }
 
         @keyframes energyFlow {
-            to {
-                /* Valor negativo inverte a direção para esquerda -> direita */
-                background-position: -200% center;
-            }
+            to { background-position: -200% center; }
         }
 
         .nav-links { display: flex; gap: 2rem; position: relative; }
@@ -132,7 +131,6 @@
             overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center;
             touch-action: pan-y; user-select: none;
         }
-        /* Wrapper para garantir ordem correta dos slides no DOM */
         #hero-slides-container {
             position: absolute; inset: 0; z-index: 5;
         }
@@ -707,7 +705,44 @@
             generateFavoritesSection();
             sections = [albumSection, favoritesSection, ...rawSections];
             allPlayableSongs = [];
-            rawSections.forEach(sec => sec.songs.forEach(s => allPlayableSongs.push({ ...s, sectionName: sec.profile, sectionGradient: sec.gradient, flag: sec.flag, sectionId: sec.id })));
+            
+            // Build allPlayableSongs correctly based on user request:
+            // "começar tocando a partir do álbum oficial e usar todas as seções de música, menos os favoritos"
+            // The album section (index 0) contains principal songs.
+            // The rawSections (index 2+) contain the rest (including principal songs again).
+            // To avoid duplication and follow the order: Album -> Raw Sections (minus principals already played?), 
+            // or just Album + Raw Sections (minus principals)?
+            // A simple "Play All" usually just plays the raw list of all unique songs.
+            // But the user asked to START with the album.
+            // So: Album Songs + (All other songs from rawSections NOT in Album).
+            
+            const albumFileSet = new Set(principalSongs.map(s => s.file));
+            
+            // 1. Add Album Songs
+            principalSongs.forEach(s => {
+                allPlayableSongs.push({ 
+                    ...s, 
+                    sectionName: albumSection.profile, 
+                    sectionGradient: albumSection.gradient, 
+                    flag: albumSection.flag, 
+                    sectionId: albumSection.id 
+                });
+            });
+
+            // 2. Add remaining songs from Raw Sections
+            rawSections.forEach(sec => {
+                sec.songs.forEach(s => {
+                    if (!albumFileSet.has(s.file)) {
+                         allPlayableSongs.push({ 
+                            ...s, 
+                            sectionName: sec.profile, 
+                            sectionGradient: sec.gradient, 
+                            flag: sec.flag, 
+                            sectionId: sec.id 
+                        });
+                    }
+                });
+            });
         }
 
         function generateFavoritesSection() {
@@ -818,9 +853,60 @@
             countEl.innerText = `${sectionData.songs.length} faixas`;
         }
 
-        function playAllSongs() { playQueue = allPlayableSongs.map(s => ({...s, domId: null})); if(isShuffle) shuffleQueue(); currentSongIndex = 0; loadAndPlay(); }
-        function playSection(sectionId) { const section = sections.find(s => s.id === sectionId); playQueue = section.songs.map((s, idx) => ({ ...s, sectionName: section.profile, sectionGradient: section.gradient, flag: section.flag, domId: `${sectionId}-${idx}` })); if(isShuffle) shuffleQueue(); currentSongIndex = 0; loadAndPlay(); }
-        function playSpecificContext(sectionId, songIndex) { const section = sections.find(s => s.id === sectionId); playQueue = section.songs.map((s, idx) => ({ ...s, sectionName: section.profile, sectionGradient: section.gradient, flag: section.flag, domId: `${sectionId}-${idx}` })); currentSongIndex = songIndex; loadAndPlay(); }
+        // Updated shuffle logic to actually shuffle the array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function playAllSongs() { 
+            // Clone the master list to avoid modifying the original order permanently
+            playQueue = allPlayableSongs.map(s => ({...s, domId: null})); 
+            
+            if(isShuffle) {
+                shuffleArray(playQueue);
+            }
+            
+            currentSongIndex = 0; 
+            loadAndPlay(); 
+        }
+
+        function playSection(sectionId) { 
+            const section = sections.find(s => s.id === sectionId); 
+            // Clone section songs
+            playQueue = section.songs.map((s, idx) => ({ ...s, sectionName: section.profile, sectionGradient: section.gradient, flag: section.flag, domId: `${sectionId}-${idx}` })); 
+            
+            if(isShuffle) {
+                shuffleArray(playQueue);
+            }
+            
+            currentSongIndex = 0; 
+            loadAndPlay(); 
+        }
+
+        function playSpecificContext(sectionId, songIndex) { 
+            const section = sections.find(s => s.id === sectionId); 
+            // We want to play THIS song, then continue with the rest of the context.
+            // If shuffle is on, we play this song, then shuffle the REST.
+            
+            playQueue = section.songs.map((s, idx) => ({ ...s, sectionName: section.profile, sectionGradient: section.gradient, flag: section.flag, domId: `${sectionId}-${idx}` })); 
+            
+            if(isShuffle) {
+                // Move selected song to start, shuffle the rest
+                const selected = playQueue[songIndex];
+                const others = playQueue.filter((_, i) => i !== songIndex);
+                shuffleArray(others);
+                playQueue = [selected, ...others];
+                currentSongIndex = 0;
+            } else {
+                currentSongIndex = songIndex; 
+            }
+            
+            loadAndPlay(); 
+        }
 
         function loadAndPlay() {
             if (currentSongIndex < 0 || currentSongIndex >= playQueue.length) return;
@@ -859,12 +945,6 @@
                     });
                 } catch(e){}
              }
-             
-             // Fallback for player art if extraction fails or takes too long: use section flag/logo if available
-             // (Logic: if extraction works, it overwrites this quickly. If fails, user sees flag)
-             // Actually, let's set a timeout fallback if extraction is slow? No, simple:
-             // If we have a countryCode image (flag), we can use it as placeholder in player too.
-             // But let's stick to current behavior unless requested.
 
             document.getElementById('playerTitle').innerText = song.title;
             document.getElementById('playerMeta').innerText = `${song.sectionName} • ${song.flag}`;
@@ -917,9 +997,25 @@
         function toggleShuffle() {
             isShuffle = !isShuffle;
             const btn = document.getElementById('btnShuffle');
-            if(isShuffle) { btn.classList.add('active'); shuffleQueue(); } else { btn.classList.remove('active'); }
+            if(isShuffle) { 
+                btn.classList.add('active'); 
+                // Shuffle immediately if playing? 
+                // A common pattern is to shuffle the REST of the queue.
+                if (playQueue.length > 0) {
+                     const currentSong = playQueue[currentSongIndex];
+                     const remainder = playQueue.filter((_, i) => i !== currentSongIndex);
+                     shuffleArray(remainder);
+                     // Reconstruct queue: Current song stays, rest is shuffled
+                     playQueue = [currentSong, ...remainder];
+                     currentSongIndex = 0; // Reset index to 0 since current song is now first
+                }
+            } else { 
+                btn.classList.remove('active'); 
+                // Unshuffling is hard without keeping original index. 
+                // Usually users don't expect "unshuffle" to return to exact previous state mid-playback.
+            }
         }
-        function shuffleQueue() { }
+        
         function seekRelative(sec) { audio.currentTime += sec; }
         function seekAudio(e) {
             const width = e.target.clientWidth;
@@ -949,6 +1045,7 @@
             window.scrollTo({ top: pos, behavior: "smooth" });
         }
 
+        // --- INIT FUNCTION (DEFINED AT THE END TO ENSURE ALL IS READY) ---
         function init() {
             generateData();
             const hero = document.getElementById('hero');
@@ -960,17 +1057,19 @@
             document.getElementById('btnPlayAllText').innerText = `Todas (${allPlayableSongs.length})`;
 
             // Initialize Intersection Observer for lazy loading art
-            observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const card = entry.target;
-                        const file = card.dataset.file;
-                        const id = card.id.replace('card-', '');
-                        loadCoverArt(file, `img-${id}`, `icon-${id}`);
-                        observer.unobserve(card); // Only load once
-                    }
-                });
-            }, { rootMargin: "100px" });
+            if(window.IntersectionObserver) {
+                observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const card = entry.target;
+                            const file = card.dataset.file;
+                            const id = card.id.replace('card-', '');
+                            loadCoverArt(file, `img-${id}`, `icon-${id}`);
+                            observer.unobserve(card); // Only load once
+                        }
+                    });
+                }, { rootMargin: "100px" });
+            }
 
             submenuContainer.innerHTML = '';
             sections.forEach(sec => {
