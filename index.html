@@ -61,23 +61,21 @@
             font-family: 'Inter', sans-serif;
             font-weight: 900;
             font-size: 2rem;
-            /* Gradiente BEM mais claro para contraste no dark mode mobile */
+            /* Cores originais vibrantes com brilho branco */
             background: linear-gradient(
                 110deg, 
-                #a5b4fc 20%,  /* Indigo 300 */
-                #e9d5ff 40%,  /* Purple 200 */
+                #6366f1 20%, 
+                #a855f7 40%, 
                 #ffffff 50%, 
-                #e9d5ff 60%, 
-                #a5b4fc 80%
+                #a855f7 60%, 
+                #6366f1 80%
             );
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -1px;
-            /* Glow externo mais forte e claro */
-            filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.9));
-            /* Animação lenta */
+            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
             animation: energyFlow 10s linear infinite;
         }
 
@@ -144,7 +142,7 @@
         
         .hero-content {
             position: relative;
-            z-index: 30; /* Acima da zona de pausa */
+            z-index: 30; 
             text-align: center;
             width: 100%;
             display: flex;
@@ -154,7 +152,7 @@
 
         .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); z-index: -1; }
         
-        /* Gradiente: 1/3 transparente, depois escurece */
+        /* Ajuste de opacidade: 1/3 transparente, depois escurece */
         .hero-overlay-dark { 
             position: absolute; 
             inset: 0; 
@@ -200,12 +198,41 @@
         .nav-zone.right:hover { background: linear-gradient(to left, rgba(0,0,0,0.3), transparent); }
         .nav-zone.left { left: 0; }
         .nav-zone.right { right: 0; }
-        /* Removed pause-zone so clicks can reach buttons */
-
+        
         .carousel-progress-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(255,255,255,0.1); width: 100%; z-index: 10; }
         .carousel-progress-fill { height: 100%; background: var(--accent); width: 0; }
         .carousel-progress-fill.animating { animation: progressFill 8s linear; } 
         @keyframes progressFill { from { width: 0%; } to { width: 100%; } }
+
+        /* --- VIBE BANNER (RESTAURADO) --- */
+        .vibe-banner {
+            background: linear-gradient(120deg, #4f46e5, #9333ea, #db2777);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .vibe-banner::before {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        .vibe-banner h3 { font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 800; position: relative; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .vibe-banner p { font-size: 0.95rem; margin-bottom: 1.5rem; opacity: 0.95; position: relative; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .vibe-btn {
+            background: white; color: #4f46e5; border: none; padding: 0.8rem 2rem;
+            border-radius: 99px; font-weight: 700; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            position: relative; z-index: 2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .vibe-btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
 
         /* Botões */
         .btn { padding: 0.6rem 1.8rem; border-radius: 9999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; position: relative; z-index: 35; }
@@ -321,7 +348,8 @@
             height: auto; min-height: 70px;
         }
         .player-bar.visible { transform: translateY(0); }
-        .player-info { display: flex; align-items: center; gap: 0.8rem; width: 30%; min-width: 120px; }
+        .player-info { display: flex; align-items: center; gap: 0.8rem; width: 30%; min-width: 120px; cursor: pointer; transition: opacity 0.2s; }
+        .player-info:hover { opacity: 0.8; }
         .player-art { width: 48px; height: 48px; border-radius: 6px; background: #334155; display: flex; align-items: flex-end; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
         .player-art img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; display: none; }
         
@@ -507,7 +535,7 @@
 
     <!-- PLAYER FIXO (RODAPÉ) -->
     <div class="player-bar" id="playerBar">
-        <div class="player-info">
+        <div class="player-info" onclick="scrollToCurrentSong()">
             <div class="player-art" id="playerArt" style="background: linear-gradient(to bottom right, #4f46e5, #ec4899);">
                 <!-- Dynamic Image Container for Player -->
                 <img id="playerArtImg" src="" alt="Album Art" />
@@ -603,13 +631,8 @@
         // Logic for lazy loading metadata
         function loadCoverArt(url, imgId, iconId) {
             if (typeof jsmediatags === 'undefined') return;
-            
-            // Note: This often requires CORS enabled server or local file access
-            // Wrapped in try/catch for safety
             try {
-                // Ensure absolute URL and correct encoding
                 const absoluteUrl = new URL(url, document.baseURI).href;
-                
                 jsmediatags.read(absoluteUrl, {
                     onSuccess: function(tag) {
                         const tags = tag.tags;
@@ -630,13 +653,9 @@
                             }
                         }
                     },
-                    onError: function(error) {
-                         // console.log("Meta read error:", error);
-                    }
+                    onError: function(error) { }
                 });
-            } catch(e) {
-                // console.log("Read error:", e);
-            }
+            } catch(e) { }
         }
 
         function renderSongCards(section) {
@@ -650,7 +669,7 @@
                 const activeClass = isFav ? 'active' : '';
                 const starIcon = song.isPrincipal ? '<i data-lucide="star" size="12" class="text-yellow" style="display:inline; fill:currentColor; margin-left:4px;"></i>' : '';
                 
-                // Add to observer queue (conceptually, handled in init)
+                // Add to observer queue
                 setTimeout(() => {
                    const card = document.getElementById(`card-${domId}`);
                    if(card && observer) observer.observe(card);
@@ -705,16 +724,6 @@
             generateFavoritesSection();
             sections = [albumSection, favoritesSection, ...rawSections];
             allPlayableSongs = [];
-            
-            // Build allPlayableSongs correctly based on user request:
-            // "começar tocando a partir do álbum oficial e usar todas as seções de música, menos os favoritos"
-            // The album section (index 0) contains principal songs.
-            // The rawSections (index 2+) contain the rest (including principal songs again).
-            // To avoid duplication and follow the order: Album -> Raw Sections (minus principals already played?), 
-            // or just Album + Raw Sections (minus principals)?
-            // A simple "Play All" usually just plays the raw list of all unique songs.
-            // But the user asked to START with the album.
-            // So: Album Songs + (All other songs from rawSections NOT in Album).
             
             const albumFileSet = new Set(principalSongs.map(s => s.file));
             
@@ -873,6 +882,13 @@
             currentSongIndex = 0; 
             loadAndPlay(); 
         }
+        
+        function playAllShuffle() {
+            // Function for the new Vibe Banner button
+            isShuffle = true;
+            document.getElementById('btnShuffle').classList.add('active'); // Sync UI
+            playAllSongs();
+        }
 
         function playSection(sectionId) { 
             const section = sections.find(s => s.id === sectionId); 
@@ -908,25 +924,67 @@
             loadAndPlay(); 
         }
 
+        function scrollToCurrentSong() {
+            if (currentSongIndex < 0 || currentSongIndex >= playQueue.length) return;
+            const song = playQueue[currentSongIndex];
+            
+            let targetId = song.domId;
+            
+            if (!targetId) {
+                const cards = document.querySelectorAll('.song-card');
+                for (let card of cards) {
+                    if (card.dataset.file === song.file) {
+                        targetId = card.id;
+                        break;
+                    }
+                }
+            } else {
+                if(!targetId.startsWith('card-')) targetId = 'card-' + targetId;
+            }
+
+            if (targetId) {
+                const element = document.getElementById(targetId);
+                if (element) {
+                    const offset = 160; 
+                    const pos = element.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({ top: pos, behavior: "smooth" });
+                    
+                    element.style.transition = "transform 0.3s, box-shadow 0.3s";
+                    element.style.transform = "scale(1.02)";
+                    element.style.boxShadow = "0 0 20px " + getComputedStyle(document.documentElement).getPropertyValue('--primary');
+                    
+                    setTimeout(() => {
+                        element.style.transform = "";
+                        element.style.boxShadow = "";
+                    }, 1000);
+                }
+            }
+        }
+
         function loadAndPlay() {
             if (currentSongIndex < 0 || currentSongIndex >= playQueue.length) return;
             const song = playQueue[currentSongIndex];
+            
+            // Check cache logic here: if src matches, don't reload
+            // Correction: actually we often want to reset playback position to 0 if "play" is clicked again.
+            // But if it's the exact same file playing, we might just want to ensure it plays.
+            const currentSrc = audio.src ? decodeURIComponent(audio.src.split(window.location.origin + '/').pop()) : '';
+            // Note: simple check. 
+            // Better to force load to ensure state consistency for now, browser handles caching well.
+            
             document.querySelectorAll('.song-card.active').forEach(el => el.classList.remove('active', 'playing'));
             document.querySelectorAll('.play-btn-small i[data-lucide="pause"]').forEach(el => { el.setAttribute('data-lucide', 'play'); lucide.createIcons({ root: el.parentElement }); });
             
-            // CORREÇÃO: Removido o prefixo "musicas/" duplicado, pois song.file já contém o caminho completo
             audio.src = song.file; 
             
-            // Try to load player art
+            // Player Art Logic (Lazy load inside player too)
             const playerArtImg = document.getElementById('playerArtImg');
             const playerIcon = document.getElementById('staticFooterIcon');
             playerArtImg.style.display = 'none';
             playerIcon.style.display = 'block';
             
-            // Try to extract metadata for player
-             if (typeof jsmediatags !== 'undefined') {
+            if (typeof jsmediatags !== 'undefined') {
                 try {
-                    // Use absolute URL for player too
                     const absoluteUrl = new URL(song.file, document.baseURI).href;
                     jsmediatags.read(absoluteUrl, {
                         onSuccess: function(tag) {
@@ -939,11 +997,18 @@
                                 playerArtImg.src = base64;
                                 playerArtImg.style.display = 'block';
                                 playerIcon.style.display = 'none';
+                                
+                                // Also set metadata for Media Session
+                                updateMediaSession(song, base64);
+                            } else {
+                                updateMediaSession(song, null);
                             }
                         },
-                        onError: function(e) {}
+                        onError: function(e) { updateMediaSession(song, null); }
                     });
-                } catch(e){}
+                } catch(e){ updateMediaSession(song, null); }
+             } else {
+                 updateMediaSession(song, null);
              }
 
             document.getElementById('playerTitle').innerText = song.title;
@@ -951,31 +1016,86 @@
             document.getElementById('playerArt').style.background = song.sectionGradient;
             document.getElementById('footerWaves').classList.add('active');
             document.getElementById('playerBar').classList.add('visible');
-            if (song.domId) {
-                const card = document.getElementById(`card-${song.domId}`);
+            
+            let targetId = song.domId;
+            if (!targetId) {
+                 const cards = document.querySelectorAll('.song-card');
+                 for (let card of cards) {
+                     if (card.dataset.file === song.file) {
+                         card.classList.add('active', 'playing');
+                         const icon = card.querySelector('.play-btn-small i');
+                         if(icon) { icon.setAttribute('data-lucide', 'pause'); lucide.createIcons({ root: card }); }
+                         break; 
+                     }
+                 }
+            } else {
+                if(!targetId.startsWith('card-')) targetId = 'card-' + targetId;
+                const card = document.getElementById(targetId);
                 if (card) {
                     card.classList.add('active', 'playing');
-                    const icon = card.querySelector(`#btn-icon-${song.domId}`);
+                    const icon = card.querySelector('.play-btn-small i');
                     if(icon) { icon.setAttribute('data-lucide', 'pause'); lucide.createIcons({ root: card }); }
                 }
             }
-            audio.play().then(() => { isPlaying = true; updateGlobalPlayButton(); }).catch(e => console.log(e));
+
+            // Play with error handling
+            var playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    isPlaying = true;
+                    updateGlobalPlayButton();
+                    // Media Session state
+                    if('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
+                })
+                .catch(error => {
+                    console.log("Playback prevented:", error);
+                    isPlaying = false;
+                    updateGlobalPlayButton();
+                });
+            }
+        }
+        
+        function updateMediaSession(song, artworkSrc) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: song.title,
+                    artist: "Projeto BSB",
+                    album: song.sectionName,
+                    artwork: [
+                        { src: artworkSrc || 'https://via.placeholder.com/512?text=BSB', sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+                
+                navigator.mediaSession.setActionHandler('play', togglePlay);
+                navigator.mediaSession.setActionHandler('pause', togglePlay);
+                navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+                navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+            }
         }
 
         function togglePlay() {
-            if (audio.paused) { audio.play(); isPlaying = true; } else { audio.pause(); isPlaying = false; }
+            if (audio.paused) { 
+                audio.play(); 
+                isPlaying = true; 
+                if('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
+            } else { 
+                audio.pause(); 
+                isPlaying = false; 
+                if('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+            }
             updateGlobalPlayButton();
             if(isPlaying) document.getElementById('footerWaves').classList.add('active'); else document.getElementById('footerWaves').classList.remove('active');
-            const song = playQueue[currentSongIndex];
-            if(song && song.domId) {
-                const card = document.getElementById(`card-${song.domId}`);
-                if(card) {
-                    const icon = card.querySelector(`#btn-icon-${song.domId}`);
-                    if(isPlaying) { card.classList.add('playing'); if(icon) icon.setAttribute('data-lucide', 'pause'); }
-                    else { card.classList.remove('playing'); if(icon) icon.setAttribute('data-lucide', 'play'); }
-                    lucide.createIcons({ root: card });
+            
+            const playingCards = document.querySelectorAll('.song-card.playing');
+            playingCards.forEach(card => {
+                const icon = card.querySelector('.play-btn-small i');
+                if(isPlaying) {
+                     if(icon) icon.setAttribute('data-lucide', 'pause');
+                } else {
+                     if(icon) icon.setAttribute('data-lucide', 'play');
                 }
-            }
+                lucide.createIcons({ root: card });
+            });
         }
 
         function updateGlobalPlayButton() {
@@ -999,23 +1119,18 @@
             const btn = document.getElementById('btnShuffle');
             if(isShuffle) { 
                 btn.classList.add('active'); 
-                // Shuffle immediately if playing? 
-                // A common pattern is to shuffle the REST of the queue.
                 if (playQueue.length > 0) {
                      const currentSong = playQueue[currentSongIndex];
                      const remainder = playQueue.filter((_, i) => i !== currentSongIndex);
                      shuffleArray(remainder);
-                     // Reconstruct queue: Current song stays, rest is shuffled
                      playQueue = [currentSong, ...remainder];
-                     currentSongIndex = 0; // Reset index to 0 since current song is now first
+                     currentSongIndex = 0; 
                 }
             } else { 
                 btn.classList.remove('active'); 
-                // Unshuffling is hard without keeping original index. 
-                // Usually users don't expect "unshuffle" to return to exact previous state mid-playback.
             }
         }
-        
+        function shuffleQueue() { }
         function seekRelative(sec) { audio.currentTime += sec; }
         function seekAudio(e) {
             const width = e.target.clientWidth;
@@ -1100,6 +1215,17 @@
             `;
             document.head.appendChild(style);
 
+            // Add Vibe Banner to Playlist Container (Re-adding it via JS so it persists after clear)
+            const vibeBanner = document.createElement('div');
+            vibeBanner.className = 'vibe-banner';
+            vibeBanner.innerHTML = `
+                <h3>Sinta a Vibe BRICS</h3>
+                <p>Deixe o dia rolar com os maiores sucessos em modo aleatório.</p>
+                <button class="vibe-btn" onclick="playAllShuffle()">
+                    <i data-lucide="shuffle" size="20"></i> Play Aleatório
+                </button>
+            `;
+            playlistContainer.appendChild(vibeBanner);
 
             // Renderiza Seções e Banner
             sections.forEach((section, idx) => {
