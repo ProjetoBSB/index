@@ -371,6 +371,28 @@
         .wave:nth-child(4) { animation-delay: 0.1s; height: 70%; }
         @keyframes waveAnim { 0% { height: 10%; } 100% { height: 80%; } }
 
+        /* Marquee para o título da música no player */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+        .marquee-content {
+            display: inline-block;
+            padding-left: 0;
+            will-change: transform;
+        }
+        .marquee-content.animate {
+            padding-left: 100%; /* Começa de fora */
+            animation: marqueeScroll 12s linear infinite;
+        }
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
         .player-controls { display: flex; align-items: center; gap: 1rem; flex-grow: 1; justify-content: center; }
         .ctrl-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
         .ctrl-btn:hover { color: white; transform: scale(1.1); }
@@ -554,7 +576,9 @@
                 <i data-lucide="music" color="white" style="position: absolute; bottom: 12px;" id="staticFooterIcon"></i>
             </div>
             <div style="overflow: hidden; flex: 1;">
-                <div id="playerTitle" style="font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem;">Selecione uma música</div>
+                <div id="playerTitleContainer" class="marquee-container">
+                    <div id="playerTitleContent" class="marquee-content" style="font-weight: 700; font-size: 0.9rem;">Selecione uma música</div>
+                </div>
                 <div id="playerMeta" style="font-size: 0.75rem; color: #94a3b8;">Projeto BSB</div>
             </div>
         </div>
@@ -579,7 +603,7 @@
     </div>
 
     <!-- AUDIO ELEMENT -->
-    <audio id="audioPlayer"></audio>
+    <audio id="audioPlayer" preload="auto"></audio>
 
     <script>
         // --- GLOBAL VARIABLES ---
@@ -618,8 +642,6 @@
             { id: 'somos_ipea', profile: 'Somos IPEA', country: 'BRICS', flag: '🌐', gradient: 'linear-gradient(135deg, #0ea5e9, #3b82f6)', desc: 'A identidade que nos une.', songs: [ { title: 'Somos IPEA (BRICS Street Boys and friends) (Extended)', file: 'musicas/Somos_IPEA/Somos IPEA (BRICS Street Boys and friends) (Extended).mp3', duration: '4:15' }, { title: 'Somos IPEA (BRICS Street Boys and friends) (Short version)', file: 'musicas/Somos_IPEA/Somos IPEA (BRICS Street Boys and friends) (Short version).mp3', duration: '2:11' }, { title: 'We Are IPEA (BRICS Street Boys and friends)', file: 'musicas/Somos_IPEA/We Are IPEA (BRICS Street Boys and friends).mp3', duration: '4:00' } ] }
         ];
 
-        // --- FUNCTIONS MOVED TO TOP LEVEL ---
-
         function getFlagContent(section, type = 'section') {
             if (section.countryCode === 'band_logo') {
                 const cssClass = type === 'hero' ? 'hero-flag-img' : (type === 'submenu' ? 'submenu-flag-img' : 'section-flag-img');
@@ -631,12 +653,6 @@
                 return `<img src="${url}" alt="${section.country}" class="${cssClass}">`;
             }
             return section.flag;
-        }
-
-        function createSectionHTML(section) {
-            const flagHTML = getFlagContent(section, 'section');
-            const historyTitle = section.id === 'album-guerreiros' ? 'História por trás do álbum' : 'História por trás das músicas';
-            return `<div class="section-header"><div class="section-flag">${flagHTML}</div><div class="section-title"><h3>${section.profile} <span class="badge">${section.country}</span></h3><div style="display:flex; flex-direction:column; gap:2px;"><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; margin-top:4px;">${section.songs.length} faixas</small><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; cursor:pointer; transition:0.2s;" onclick="toggleHistory('${section.id}')" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'"><i data-lucide="info" size="14"></i> ${historyTitle}</small></div></div></div><div class="history-panel" id="history-${section.id}"><div class="history-content"><button class="close-history" onclick="toggleHistory('${section.id}')"><i data-lucide="x" size="16"></i></button><strong>Contexto:</strong><br>Aqui você descobre a inspiração técnica e artística por trás das faixas de ${section.profile}.<br>A IA capturou a essência de dados e cultura para criar algo novo.</div></div><div class="song-grid" id="grid-${section.id}">${renderSongCards(section)}</div>`;
         }
 
         function generateData() {
@@ -688,39 +704,33 @@
 
         function generateFavoritesSection() {
             const favSongs = [];
-            rawSections.forEach(sec => sec.songs.forEach(s => { if(userFavorites.includes(s.file)) favSongs.push({ ...s, displayContext: sec.profile }); }));
-            favoritesSection = { id: 'favoritos', profile: 'Meus Favoritos', country: 'Sua Seleção', flag: '❤️', gradient: 'linear-gradient(135deg, #f43f5e, #be123c)', desc: 'Sua lista pessoal de músicas favoritas.', songs: favSongs };
+            userFavorites.forEach(filePath => {
+                for(const sec of rawSections) {
+                    const found = sec.songs.find(s => s.file === filePath);
+                    if(found) {
+                        favSongs.push({ ...found, displayContext: sec.profile });
+                        break;
+                    }
+                }
+            });
+
+            favoritesSection = { 
+                id: 'favoritos', 
+                profile: 'Meus Favoritos', 
+                country: 'Sua Seleção', 
+                flag: '❤️', 
+                gradient: 'linear-gradient(135deg, #f43f5e, #be123c)', 
+                desc: 'Sua lista pessoal de músicas favoritas.', 
+                songs: favSongs 
+            };
+            
             if(sections.length > 1) sections[1] = favoritesSection;
         }
 
-        // Logic for lazy loading metadata
-        function loadCoverArt(url, imgId, iconId) {
-            if (typeof jsmediatags === 'undefined') return;
-            try {
-                const absoluteUrl = new URL(url, document.baseURI).href;
-                jsmediatags.read(absoluteUrl, {
-                    onSuccess: function(tag) {
-                        const tags = tag.tags;
-                        if (tags.picture) {
-                            const { data, format } = tags.picture;
-                            let base64String = "";
-                            for (let i = 0; i < data.length; i++) {
-                                base64String += String.fromCharCode(data[i]);
-                            }
-                            const base64 = "data:" + format + ";base64," + window.btoa(base64String);
-                            
-                            const img = document.getElementById(imgId);
-                            const icon = document.getElementById(iconId);
-                            if (img && icon) {
-                                img.src = base64;
-                                img.style.display = 'block';
-                                icon.style.display = 'none';
-                            }
-                        }
-                    },
-                    onError: function(error) { }
-                });
-            } catch(e) { }
+        function createSectionHTML(section) {
+            const flagHTML = getFlagContent(section, 'section');
+            const historyTitle = section.id === 'album-guerreiros' ? 'História por trás do álbum' : 'História por trás das músicas';
+            return `<div class="section-header"><div class="section-flag">${flagHTML}</div><div class="section-title"><h3>${section.profile} <span class="badge">${section.country}</span></h3><div style="display:flex; flex-direction:column; gap:2px;"><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; margin-top:4px;">${section.songs.length} faixas</small><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; cursor:pointer; transition:0.2s;" onclick="toggleHistory('${section.id}')" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'"><i data-lucide="info" size="14"></i> ${historyTitle}</small></div></div></div><div class="history-panel" id="history-${section.id}"><div class="history-content"><button class="close-history" onclick="toggleHistory('${section.id}')"><i data-lucide="x" size="16"></i></button><strong>Contexto:</strong><br>Aqui você descobre a inspiração técnica e artística por trás das faixas de ${section.profile}.<br>A IA capturou a essência de dados e cultura para criar algo novo.</div></div><div class="song-grid" id="grid-${section.id}">${renderSongCards(section)}</div>`;
         }
 
         function renderSongCards(section) {
@@ -740,7 +750,6 @@
                 const dragAttr = isFavorites ? 'draggable="true"' : '';
                 const dragHandle = isFavorites ? `<div class="drag-handle" title="Arraste para reordenar"><i data-lucide="grip-vertical" size="20"></i></div>` : '';
 
-                // Add to observer queue (conceptually, handled in init)
                 setTimeout(() => {
                    const card = document.getElementById(`card-${domId}`);
                    if(card && observer) observer.observe(card);
@@ -780,6 +789,35 @@
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function loadCoverArt(url, imgId, iconId) {
+            if (typeof jsmediatags === 'undefined') return;
+            try {
+                const absoluteUrl = new URL(url, document.baseURI).href;
+                jsmediatags.read(absoluteUrl, {
+                    onSuccess: function(tag) {
+                        const tags = tag.tags;
+                        if (tags.picture) {
+                            const { data, format } = tags.picture;
+                            let base64String = "";
+                            for (let i = 0; i < data.length; i++) {
+                                base64String += String.fromCharCode(data[i]);
+                            }
+                            const base64 = "data:" + format + ";base64," + window.btoa(base64String);
+                            
+                            const img = document.getElementById(imgId);
+                            const icon = document.getElementById(iconId);
+                            if (img && icon) {
+                                img.src = base64;
+                                img.style.display = 'block';
+                                icon.style.display = 'none';
+                            }
+                        }
+                    },
+                    onError: function(error) { }
+                });
+            } catch(e) { }
         }
 
         function loadVideo() {
@@ -1026,7 +1064,6 @@
             countEl.innerText = `${sectionData.songs.length} faixas`;
         }
 
-        // Updated shuffle logic to actually shuffle the array
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1036,46 +1073,34 @@
         }
 
         function playAllSongs() { 
-            // Clone the master list to avoid modifying the original order permanently
             playQueue = allPlayableSongs.map(s => ({...s, domId: null})); 
-            
             if(isShuffle) {
                 shuffleArray(playQueue);
             }
-            
             currentSongIndex = 0; 
             loadAndPlay(); 
         }
         
         function playAllShuffle() {
-            // Function for the new Vibe Banner button
             isShuffle = true;
-            document.getElementById('btnShuffle').classList.add('active'); // Sync UI
+            document.getElementById('btnShuffle').classList.add('active'); 
             playAllSongs();
         }
 
         function playSection(sectionId) { 
             const section = sections.find(s => s.id === sectionId); 
-            // Clone section songs
             playQueue = section.songs.map((s, idx) => ({ ...s, sectionName: section.profile, sectionGradient: section.gradient, flag: section.flag, domId: `${sectionId}-${idx}` })); 
-            
             if(isShuffle) {
                 shuffleArray(playQueue);
             }
-            
             currentSongIndex = 0; 
             loadAndPlay(); 
         }
 
         function playSpecificContext(sectionId, songIndex) { 
             const section = sections.find(s => s.id === sectionId); 
-            // We want to play THIS song, then continue with the rest of the context.
-            // If shuffle is on, we play this song, then shuffle the REST.
-            
             playQueue = section.songs.map((s, idx) => ({ ...s, sectionName: section.profile, sectionGradient: section.gradient, flag: section.flag, domId: `${sectionId}-${idx}` })); 
-            
             if(isShuffle) {
-                // Move selected song to start, shuffle the rest
                 const selected = playQueue[songIndex];
                 const others = playQueue.filter((_, i) => i !== songIndex);
                 shuffleArray(others);
@@ -1084,43 +1109,27 @@
             } else {
                 currentSongIndex = songIndex; 
             }
-            
             loadAndPlay(); 
         }
 
         function scrollToCurrentSong() {
             if (currentSongIndex < 0 || currentSongIndex >= playQueue.length) return;
             const song = playQueue[currentSongIndex];
-            
             let targetId = song.domId;
-            
             if (!targetId) {
                 const cards = document.querySelectorAll('.song-card');
-                for (let card of cards) {
-                    if (card.dataset.file === song.file) {
-                        targetId = card.id;
-                        break;
-                    }
-                }
-            } else {
-                if(!targetId.startsWith('card-')) targetId = 'card-' + targetId;
-            }
-
+                for (let card of cards) { if (card.dataset.file === song.file) { targetId = card.id; break; } }
+            } else { if(!targetId.startsWith('card-')) targetId = 'card-' + targetId; }
             if (targetId) {
                 const element = document.getElementById(targetId);
                 if (element) {
                     const offset = 160; 
                     const pos = element.getBoundingClientRect().top + window.pageYOffset - offset;
                     window.scrollTo({ top: pos, behavior: "smooth" });
-                    
                     element.style.transition = "transform 0.3s, box-shadow 0.3s";
                     element.style.transform = "scale(1.02)";
                     element.style.boxShadow = "0 0 20px " + getComputedStyle(document.documentElement).getPropertyValue('--primary');
-                    
-                    setTimeout(() => {
-                        element.style.transform = "";
-                        element.style.boxShadow = "";
-                    }, 1000);
+                    setTimeout(() => { element.style.transform = ""; element.style.boxShadow = ""; }, 1000);
                 }
             }
         }
@@ -1129,24 +1138,36 @@
             if (currentSongIndex < 0 || currentSongIndex >= playQueue.length) return;
             const song = playQueue[currentSongIndex];
             
-            // Check cache logic here: if src matches, don't reload
-            // Correction: actually we often want to reset playback position to 0 if "play" is clicked again.
-            // But if it's the exact same file playing, we might just want to ensure it plays.
-            const currentSrc = audio.src ? decodeURIComponent(audio.src.split(window.location.origin + '/').pop()) : '';
-            // Note: simple check. 
-            // Better to force load to ensure state consistency for now, browser handles caching well.
-            
             document.querySelectorAll('.song-card.active').forEach(el => el.classList.remove('active', 'playing'));
             document.querySelectorAll('.play-btn-small i[data-lucide="pause"]').forEach(el => { el.setAttribute('data-lucide', 'play'); lucide.createIcons({ root: el.parentElement }); });
             
             audio.src = song.file; 
+
+            // Configura título
+            const titleEl = document.getElementById('playerTitleContent');
+            titleEl.innerText = song.title;
+            titleEl.classList.remove('animate'); 
             
-            // Player Art Logic (Lazy load inside player too)
+            // Verifica overflow para marquee
+            setTimeout(() => {
+                const container = document.getElementById('playerTitleContainer');
+                if(titleEl.scrollWidth > container.clientWidth) {
+                    titleEl.classList.add('animate');
+                }
+            }, 50);
+
+            document.getElementById('playerMeta').innerText = `${song.sectionName} • ${song.flag}`;
+            document.getElementById('playerArt').style.background = song.sectionGradient;
+            document.getElementById('footerWaves').classList.add('active');
+            document.getElementById('playerBar').classList.add('visible');
+
+            // Metadata & Art
+            updateMediaSession(song, null); 
             const playerArtImg = document.getElementById('playerArtImg');
             const playerIcon = document.getElementById('staticFooterIcon');
             playerArtImg.style.display = 'none';
             playerIcon.style.display = 'block';
-            
+
             if (typeof jsmediatags !== 'undefined') {
                 try {
                     const absoluteUrl = new URL(song.file, document.baseURI).href;
@@ -1158,28 +1179,15 @@
                                 let base64String = "";
                                 for (let i = 0; i < data.length; i++) { base64String += String.fromCharCode(data[i]); }
                                 const base64 = "data:" + format + ";base64," + window.btoa(base64String);
-                                playerArtImg.src = base64;
-                                playerArtImg.style.display = 'block';
+                                playerArtImg.src = base64; 
+                                playerArtImg.style.display = 'block'; 
                                 playerIcon.style.display = 'none';
-                                
-                                // Also set metadata for Media Session
                                 updateMediaSession(song, base64);
-                            } else {
-                                updateMediaSession(song, null);
                             }
-                        },
-                        onError: function(e) { updateMediaSession(song, null); }
+                        }, onError: function(e) {}
                     });
-                } catch(e){ updateMediaSession(song, null); }
-             } else {
-                 updateMediaSession(song, null);
-             }
-
-            document.getElementById('playerTitle').innerText = song.title;
-            document.getElementById('playerMeta').innerText = `${song.sectionName} • ${song.flag}`;
-            document.getElementById('playerArt').style.background = song.sectionGradient;
-            document.getElementById('footerWaves').classList.add('active');
-            document.getElementById('playerBar').classList.add('visible');
+                } catch(e){}
+            }
             
             let targetId = song.domId;
             if (!targetId) {
@@ -1202,13 +1210,11 @@
                 }
             }
 
-            // Play with error handling
             var playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(_ => {
                     isPlaying = true;
                     updateGlobalPlayButton();
-                    // Media Session state
                     if('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
                 })
                 .catch(error => {
@@ -1222,14 +1228,9 @@
         function updateMediaSession(song, artworkSrc) {
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
-                    title: song.title,
-                    artist: "Projeto BSB",
-                    album: song.sectionName,
-                    artwork: [
-                        { src: artworkSrc || 'https://via.placeholder.com/512?text=BSB', sizes: '512x512', type: 'image/png' }
-                    ]
+                    title: song.title, artist: "Projeto BSB", album: song.sectionName,
+                    artwork: [ { src: artworkSrc || 'https://via.placeholder.com/512?text=BSB', sizes: '512x512', type: 'image/png' } ]
                 });
-                
                 navigator.mediaSession.setActionHandler('play', togglePlay);
                 navigator.mediaSession.setActionHandler('pause', togglePlay);
                 navigator.mediaSession.setActionHandler('previoustrack', prevSong);
@@ -1238,26 +1239,16 @@
         }
 
         function togglePlay() {
-            if (audio.paused) { 
-                audio.play(); 
-                isPlaying = true; 
-                if('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
-            } else { 
-                audio.pause(); 
-                isPlaying = false; 
-                if('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
-            }
+            if (audio.paused) { audio.play(); isPlaying = true; if('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing"; }
+            else { audio.pause(); isPlaying = false; if('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused"; }
             updateGlobalPlayButton();
             if(isPlaying) document.getElementById('footerWaves').classList.add('active'); else document.getElementById('footerWaves').classList.remove('active');
             
             const playingCards = document.querySelectorAll('.song-card.playing');
             playingCards.forEach(card => {
                 const icon = card.querySelector('.play-btn-small i');
-                if(isPlaying) {
-                     if(icon) icon.setAttribute('data-lucide', 'pause');
-                } else {
-                     if(icon) icon.setAttribute('data-lucide', 'play');
-                }
+                if(isPlaying) { if(icon) icon.setAttribute('data-lucide', 'pause'); }
+                else { if(icon) icon.setAttribute('data-lucide', 'play'); }
                 lucide.createIcons({ root: card });
             });
         }
@@ -1290,11 +1281,8 @@
                      playQueue = [currentSong, ...remainder];
                      currentSongIndex = 0; 
                 }
-            } else { 
-                btn.classList.remove('active'); 
-            }
+            } else { btn.classList.remove('active'); }
         }
-        function shuffleQueue() { }
         function seekRelative(sec) { audio.currentTime += sec; }
         function seekAudio(e) {
             const width = e.target.clientWidth;
@@ -1335,7 +1323,6 @@
 
             document.getElementById('btnPlayAllText').innerText = `Todas (${allPlayableSongs.length})`;
 
-            // Initialize Intersection Observer for lazy loading art
             if(window.IntersectionObserver) {
                 observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
@@ -1344,7 +1331,7 @@
                             const file = card.dataset.file;
                             const id = card.id.replace('card-', '');
                             loadCoverArt(file, `img-${id}`, `icon-${id}`);
-                            observer.unobserve(card); // Only load once
+                            observer.unobserve(card); 
                         }
                     });
                 }, { rootMargin: "100px" });
@@ -1360,12 +1347,10 @@
                 submenuContainer.appendChild(link);
             });
 
-            // Limpa containers
             heroSlidesContainer.innerHTML = '';
             playlistContainer.innerHTML = '';
             indicatorsContainer.innerHTML = '';
 
-            // CSS dinâmico para a capa responsiva
             const style = document.createElement('style');
             style.innerHTML = `
                 .hero-bg-responsive {
@@ -1379,26 +1364,17 @@
             `;
             document.head.appendChild(style);
 
-
-            // Renderiza Seções e Banner
             sections.forEach((section, idx) => {
-                // Banner (Append ao hero-slides-container)
                 const slide = document.createElement('div');
                 slide.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
-                
-                // Div de conteúdo interno com z-index elevado
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'hero-content'; 
 
                 if (idx === 0 && section.heroImage) {
                         slide.classList.add('hero-bg-responsive'); 
-                        
-                        // Overlay separado
                         const overlay = document.createElement('div');
                         overlay.className = 'hero-overlay-dark';
                         slide.appendChild(overlay);
-
-                        // Conteúdo
                         contentDiv.innerHTML = `
                             <div style="padding: 20px;">
                                 <h1 class="hero-title" style="margin-bottom:0.2rem; font-size:2.8rem; text-shadow:0 4px 20px black;">${section.profile}</h1>
@@ -1406,16 +1382,13 @@
                                 <button class="btn btn-primary" onclick="event.stopPropagation(); scrollToSection('${section.id}')" style="box-shadow: 0 4px 25px rgba(99, 102, 241, 0.6); transform: scale(1.1);">
                                     <i data-lucide="music" style="fill:none; stroke:white;"></i> Ouvir Álbum
                                 </button>
-                            </div>
-                        `;
+                            </div>`;
                 } else {
                     const flagHTML = getFlagContent(section, 'hero');
                     slide.style.background = section.gradient;
-                    
                     const overlay = document.createElement('div');
                     overlay.className = 'hero-overlay';
                     slide.appendChild(overlay);
-
                     contentDiv.innerHTML = `
                         <div class="hero-flag">${flagHTML}</div>
                         <h1 class="hero-title">${section.profile}</h1>
@@ -1424,26 +1397,22 @@
                             <button class="btn btn-glass" onclick="event.stopPropagation(); scrollToSection('${section.id}')">
                                 <i data-lucide="music"></i> Ver Músicas
                             </button>
-                        </div>
-                    `;
+                        </div>`;
                 }
-                
                 slide.appendChild(contentDiv); 
                 heroSlidesContainer.appendChild(slide); 
-
                 const dot = document.createElement('div');
                 dot.className = `indicator-dot ${idx === 0 ? 'active' : ''}`;
                 dot.onclick = () => goToSlide(idx);
                 indicatorsContainer.appendChild(dot);
-
                 const sectionDiv = document.createElement('div');
                 sectionDiv.id = section.id;
                 sectionDiv.className = 'section-wrapper';
                 sectionDiv.innerHTML = createSectionHTML(section);
                 playlistContainer.appendChild(sectionDiv);
             });
-            
-            // Add Vibe Slide to Hero (Last)
+
+            // Vibe Slide
             const vibeSlide = document.createElement('div');
             vibeSlide.className = `hero-slide`; 
             vibeSlide.style.background = 'linear-gradient(135deg, #4f46e5, #ec4899)'; 
@@ -1474,8 +1443,6 @@
             lucide.createIcons();
             updateStickyBar('album-guerreiros');
             window.addEventListener('scroll', onScrollSpy);
-            
-            // Force start animation immediately
             startCarousel();
             const progressFill = document.getElementById('carouselProgressFill');
             if(progressFill) {
