@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Garante que o navegador saiba que o site é escuro e não tente inverter cores -->
     <meta name="color-scheme" content="dark">
     <title>Projeto BSB - BRICS Street Boys</title>
     
@@ -61,6 +62,7 @@
             font-family: 'Inter', sans-serif;
             font-weight: 900;
             font-size: 2rem;
+            /* Cores vibrantes com animação de brilho branco */
             background: linear-gradient(
                 110deg, 
                 #6366f1 20%, 
@@ -74,7 +76,8 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -1px;
-            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
+            /* Glow ajustado para não escurecer, mas iluminar */
+            filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.6));
             animation: energyFlow 10s linear infinite;
         }
 
@@ -103,21 +106,16 @@
         .dropdown-menu::-webkit-scrollbar { width: 6px; }
         .dropdown-menu::-webkit-scrollbar-track { background: var(--bg-card); }
         .dropdown-menu::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-        
         .nav-item:hover .dropdown-menu { display: block; animation: fadeIn 0.2s ease; }
         
-        /* Estilização ESPECIAL para o Submenu de Histórias */
+        /* Submenu Histórias Grid */
         #storiesSubmenu {
             min-width: 400px;
             padding: 10px;
-            grid-template-columns: 1fr 1fr; /* Duas colunas */
+            grid-template-columns: 1fr 1fr; 
             gap: 8px;
         }
-        
-        /* Sobrescreve o display block padrão apenas para o menu de histórias quando hover */
-        .nav-item:hover #storiesSubmenu {
-            display: grid; 
-        }
+        .nav-item:hover #storiesSubmenu { display: grid; }
 
         #storiesSubmenu a {
             display: flex; align-items: center; gap: 10px; padding: 10px;
@@ -129,7 +127,7 @@
             background: var(--bg-card-hover); color: white; 
             border-color: var(--primary); transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            padding-left: 10px; /* Anula o padding-left padrão do outro menu */
+            padding-left: 10px; 
         }
         
         .dropdown-menu a {
@@ -137,7 +135,6 @@
             color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: none;
             border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
         }
-        /* Apenas para o menu padrão (playlist), não afeta o de histórias pois foi sobrescrito acima */
         .dropdown-menu:not(#storiesSubmenu) a:hover { background: var(--bg-card-hover); color: white; padding-left: 20px; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
@@ -146,10 +143,32 @@
         .mobile-menu {
             display: none; position: absolute; top: 70px; left: 0; right: 0;
             background: var(--bg-card); border-bottom: 1px solid #334155; flex-direction: column;
-            padding: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-height: 80vh; overflow-y: auto;
+            padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-height: 80vh; overflow-y: auto;
         }
         .mobile-menu.active { display: flex; }
-        .mobile-menu a { padding: 1rem 0; border-bottom: 1px solid #334155; font-weight: 600; text-transform: uppercase; font-size: 0.9rem;}
+        .mobile-menu > a { padding: 1.2rem 1.5rem; border-bottom: 1px solid #334155; font-weight: 700; text-transform: uppercase; font-size: 0.95rem; color: #f1f5f9; }
+        
+        .mobile-dropdown-group { border-bottom: 1px solid #334155; }
+        .mobile-dropdown-header {
+            padding: 1.2rem 1.5rem;
+            font-weight: 700; text-transform: uppercase; font-size: 0.95rem; color: #f1f5f9;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; background: rgba(255,255,255,0.02);
+        }
+        .mobile-dropdown-content {
+            display: none; background: rgba(0,0,0,0.2);
+            flex-direction: column;
+        }
+        .mobile-dropdown-content.open { display: flex; }
+        .mobile-dropdown-content a {
+            padding: 1rem 1rem 1rem 2.5rem; 
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.85rem; color: #cbd5e1;
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 500;
+        }
+        .mobile-dropdown-content a:last-child { border-bottom: none; }
+        
         @media (max-width: 768px) { .nav-links { display: none; } .mobile-toggle { display: block; } }
 
         /* --- HERO / CAROUSEL --- */
@@ -197,7 +216,6 @@
         .hero-desc { font-size: 1.1rem; color: rgba(255,255,255,0.95); max-width: 700px; margin-bottom: 2rem; font-weight: 300; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* Animação para o ícone Vibe */
         @keyframes floatVibe {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(10deg); }
@@ -238,6 +256,18 @@
         .carousel-progress-fill.animating { animation: progressFill 8s linear; } 
         @keyframes progressFill { from { width: 0%; } to { width: 100%; } }
 
+        /* Vibe Banner (Slide) */
+        .vibe-banner { text-align: center; color: white; position: relative; z-index: 30; }
+        .vibe-btn {
+            background: white; color: #4f46e5; border: none; padding: 0.8rem 2rem;
+            border-radius: 99px; font-weight: 700; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            position: relative; z-index: 2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .vibe-btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+
         /* Botões */
         .btn { padding: 0.6rem 1.8rem; border-radius: 9999px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; position: relative; z-index: 35; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
@@ -263,7 +293,12 @@
         }
 
         /* --- SECTIONS --- */
-        .section-wrapper { margin-bottom: 3rem; scroll-margin-top: 140px; padding-top: 10px; }
+        .section-wrapper, #clips, #about { 
+            margin-bottom: 3rem; 
+            scroll-margin-top: 120px; /* Offset ajustado para 120px */
+            padding-top: 10px; 
+        }
+        
         .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.75rem; margin-top: 1rem; position: relative;}
         .section-flag { font-size: 2.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); display: flex; align-items: center; }
         .section-flag-img { height: 40px; width: auto; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
@@ -281,7 +316,6 @@
         /* --- SONG LIST --- */
         .song-grid { display: grid; gap: 0.5rem; }
         
-        /* Drag & Drop Styles */
         .song-card { 
             background: rgba(30, 41, 59, 0.4); 
             border: 1px solid transparent; 
@@ -289,7 +323,7 @@
             overflow: hidden; 
             transition: 0.3s; 
             position: relative; 
-            display: flex; /* Flex layout */
+            display: flex;
             flex-direction: column;
         }
         .song-card.dragging {
@@ -302,20 +336,17 @@
         
         .song-header { display: flex; align-items: center; padding: 0.5rem 0.75rem; gap: 0.75rem; flex-grow: 1; }
         
-        /* Drag Handle - Adjusted to be visible on left */
         .drag-handle {
-            display: none; /* Hidden by default */
+            display: none; 
             cursor: grab;
             color: var(--text-muted);
             padding: 0 0.5rem;
-            align-self: center; /* Center vertically */
+            align-self: center; 
             touch-action: none; 
         }
         .drag-handle:active { cursor: grabbing; color: var(--primary); }
         
-        /* Show handle only in favorites section */
         #grid-favoritos .drag-handle { display: flex; }
-        /* Disable hover shift on favorites to prevent drag jitter */
         #grid-favoritos .song-card:hover { transform: none; }
 
         .album-art { width: 42px; height: 42px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); background-size: cover; position: relative; flex-shrink: 0; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); overflow: hidden; }
@@ -385,8 +416,11 @@
             height: auto; min-height: 70px;
         }
         .player-bar.visible { transform: translateY(0); }
-        .player-info { display: flex; align-items: center; gap: 0.8rem; width: 30%; min-width: 120px; cursor: pointer; transition: opacity 0.2s; }
+        
+        /* Aumentado gap para separar mais a capa do texto */
+        .player-info { display: flex; align-items: center; gap: 1.2rem; width: 30%; min-width: 120px; cursor: pointer; transition: opacity 0.2s; }
         .player-info:hover { opacity: 0.8; }
+        
         .player-art { width: 48px; height: 48px; border-radius: 6px; background: #334155; display: flex; align-items: flex-end; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
         .player-art img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; display: none; }
         
@@ -404,8 +438,9 @@
             overflow: hidden;
             white-space: nowrap;
             width: 100%;
-            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            /* Máscara corrigida: Sólida na esquerda, fade na direita apenas */
+            mask-image: linear-gradient(to right, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
         }
         .marquee-content {
             display: inline-block;
@@ -413,7 +448,7 @@
             will-change: transform;
         }
         .marquee-content.animate {
-            padding-left: 100%; /* Começa de fora */
+            padding-left: 100%; 
             animation: marqueeScroll 12s linear infinite;
         }
         @keyframes marqueeScroll {
@@ -471,16 +506,35 @@
                     <a href="#">Histórias</a>
                     <div class="dropdown-menu" id="storiesSubmenu"></div>
                 </li>
-                <li class="nav-item"><a href="#clips">Clipes</a></li>
-                <li class="nav-item"><a href="#about">Sobre</a></li>
+                <li class="nav-item"><a href="#clips" onclick="event.preventDefault(); scrollToSection('clips');">Clipes</a></li>
+                <li class="nav-item"><a href="#about" onclick="event.preventDefault(); scrollToSection('about');">Sobre</a></li>
             </ul>
         </div>
         <div class="mobile-menu" id="mobileMenu">
             <a href="#" onclick="window.scrollTo(0,0); toggleMenu(); return false;">Início</a>
-            <a href="#playlist" onclick="toggleMenu()">Playlist</a>
-            <a href="#stories" onclick="toggleMenu()">Histórias</a>
-            <a href="#clips" onclick="toggleMenu()">Clipes</a>
-            <a href="#about" onclick="toggleMenu()">Sobre</a>
+            
+            <!-- Container Playlist -->
+            <div class="mobile-dropdown-group">
+                <div class="mobile-dropdown-header" onclick="toggleMobileSubmenu('mobile-playlist-list')">
+                    Playlist <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="mobile-dropdown-content" id="mobile-playlist-list">
+                    <!-- JS injects here -->
+                </div>
+            </div>
+
+            <!-- Container Histórias -->
+            <div class="mobile-dropdown-group">
+                <div class="mobile-dropdown-header" onclick="toggleMobileSubmenu('mobile-stories-list')">
+                    Histórias <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="mobile-dropdown-content" id="mobile-stories-list">
+                     <!-- JS injects here -->
+                </div>
+            </div>
+
+            <a href="#clips" onclick="toggleMenu(); scrollToSection('clips');">Clipes</a>
+            <a href="#about" onclick="toggleMenu(); scrollToSection('about');">Sobre</a>
         </div>
     </nav>
 
@@ -658,8 +712,6 @@
         }
         
         const audio = document.getElementById('audioPlayer');
-
-        // Observer for lazy loading
         let observer;
 
         const rawSections = [
@@ -688,6 +740,27 @@
                 return `<img src="${url}" alt="${section.country}" class="${cssClass}">`;
             }
             return section.flag;
+        }
+
+        function createSectionHTML(section) {
+            const flagHTML = getFlagContent(section, 'section');
+            const historyTitle = section.id === 'album-guerreiros' ? 'História por trás do álbum' : 'História por trás das músicas';
+            return `<div class="section-header"><div class="section-flag">${flagHTML}</div><div class="section-title"><h3>${section.profile} <span class="badge">${section.country}</span></h3><div style="display:flex; flex-direction:column; gap:2px;"><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; margin-top:4px;">${section.songs.length} faixas</small><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; cursor:pointer; transition:0.2s;" onclick="toggleHistory('${section.id}')" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'"><i data-lucide="info" size="14"></i> ${historyTitle}</small></div></div></div><div class="history-panel" id="history-${section.id}"><div class="history-content"><button class="close-history" onclick="toggleHistory('${section.id}')"><i data-lucide="x" size="16"></i></button><strong>Contexto:</strong><br>Aqui você descobre a inspiração técnica e artística por trás das faixas de ${section.profile}.<br>A IA capturou a essência de dados e cultura para criar algo novo.</div></div><div class="song-grid" id="grid-${section.id}">${renderSongCards(section)}</div>`;
+        }
+
+        function openSectionHistory(id) {
+            const panel = document.getElementById('history-' + id);
+            if (panel && !panel.classList.contains('open')) {
+                panel.classList.add('open');
+            }
+            scrollToSection(id);
+        }
+
+        function toggleMobileSubmenu(id) {
+            const content = document.getElementById(id);
+            if (content) {
+                content.classList.toggle('open');
+            }
         }
 
         function generateData() {
@@ -760,20 +833,6 @@
             };
             
             if(sections.length > 1) sections[1] = favoritesSection;
-        }
-
-        function createSectionHTML(section) {
-            const flagHTML = getFlagContent(section, 'section');
-            const historyTitle = section.id === 'album-guerreiros' ? 'História por trás do álbum' : 'História por trás das músicas';
-            return `<div class="section-header"><div class="section-flag">${flagHTML}</div><div class="section-title"><h3>${section.profile} <span class="badge">${section.country}</span></h3><div style="display:flex; flex-direction:column; gap:2px;"><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; margin-top:4px;">${section.songs.length} faixas</small><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; cursor:pointer; transition:0.2s;" onclick="toggleHistory('${section.id}')" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'"><i data-lucide="info" size="14"></i> ${historyTitle}</small></div></div></div><div class="history-panel" id="history-${section.id}"><div class="history-content"><button class="close-history" onclick="toggleHistory('${section.id}')"><i data-lucide="x" size="16"></i></button><strong>Contexto:</strong><br>Aqui você descobre a inspiração técnica e artística por trás das faixas de ${section.profile}.<br>A IA capturou a essência de dados e cultura para criar algo novo.</div></div><div class="song-grid" id="grid-${section.id}">${renderSongCards(section)}</div>`;
-        }
-
-        function openSectionHistory(id) {
-            const panel = document.getElementById('history-' + id);
-            if (panel && !panel.classList.contains('open')) {
-                panel.classList.add('open');
-            }
-            scrollToSection(id);
         }
 
         function updateSongListUI() {
@@ -865,7 +924,6 @@
             }).join('');
         }
 
-        // Logic for lazy loading metadata
         function loadCoverArt(url, imgId, iconId) {
             if (typeof jsmediatags === 'undefined') return;
             try {
@@ -1126,7 +1184,8 @@
         function onScrollSpy() {
             const wrappers = document.querySelectorAll('.section-wrapper');
             let currentSectionId = '';
-            wrappers.forEach(wrapper => { if (wrapper.getBoundingClientRect().top < window.innerHeight / 2) currentSectionId = wrapper.id; });
+            const threshold = 200; // Trigger when section is 200px from top
+            wrappers.forEach(wrapper => { if (wrapper.getBoundingClientRect().top < threshold) currentSectionId = wrapper.id; });
             if (currentSectionId) updateStickyBar(currentSectionId);
         }
 
@@ -1139,7 +1198,6 @@
             countEl.innerText = `${sectionData.songs.length} faixas`;
         }
 
-        // Updated shuffle logic to actually shuffle the array
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1229,7 +1287,7 @@
             if (targetId) {
                 const element = document.getElementById(targetId);
                 if (element) {
-                    const offset = 160; 
+                    const offset = 120; // Adjusted offset
                     const pos = element.getBoundingClientRect().top + window.pageYOffset - offset;
                     window.scrollTo({ top: pos, behavior: "smooth" });
                     
@@ -1436,7 +1494,7 @@
         function toggleMobilePopup(id) { document.querySelectorAll('.mobile-popup').forEach(p => { if(p.id !== id) p.classList.remove('show'); }); document.getElementById(id).classList.toggle('show'); }
         function scrollToSection(id) {
             const el = document.getElementById(id);
-            const offset = 160; 
+            const offset = 120; // Adjusted offset
             const pos = el.getBoundingClientRect().top + window.pageYOffset - offset;
             window.scrollTo({ top: pos, behavior: "smooth" });
         }
@@ -1462,7 +1520,7 @@
                             const file = card.dataset.file;
                             const id = card.id.replace('card-', '');
                             loadCoverArt(file, `img-${id}`, `icon-${id}`);
-                            observer.unobserve(card); // Only load once
+                            observer.unobserve(card); 
                         }
                     });
                 }, { rootMargin: "100px" });
@@ -1499,6 +1557,42 @@
                     storiesContainer.appendChild(storyLink);
                 }
             });
+            
+            // Populate Mobile Submenus
+            const mobilePlaylistList = document.getElementById('mobile-playlist-list');
+            const mobileStoriesList = document.getElementById('mobile-stories-list');
+            
+            if (mobilePlaylistList) mobilePlaylistList.innerHTML = '';
+            if (mobileStoriesList) mobileStoriesList.innerHTML = '';
+
+            sections.forEach(sec => {
+                const displayFlag = sec.countryCode ? getFlagContent(sec, 'submenu') : `<span>${sec.flag}</span>`;
+
+                // Mobile Playlist Item
+                const pLink = document.createElement('a');
+                pLink.href = `#${sec.id}`;
+                pLink.onclick = (e) => { 
+                    e.preventDefault(); 
+                    toggleMenu(); // Close mobile menu
+                    scrollToSection(sec.id); 
+                };
+                pLink.innerHTML = `${displayFlag} ${sec.profile}`;
+                if (mobilePlaylistList) mobilePlaylistList.appendChild(pLink);
+
+                // Mobile Stories Item (Skip Favorites)
+                if (sec.id !== 'favoritos') {
+                    const sLink = document.createElement('a');
+                    sLink.href = `#`;
+                    sLink.onclick = (e) => { 
+                        e.preventDefault(); 
+                        toggleMenu(); // Close mobile menu
+                        openSectionHistory(sec.id); 
+                    };
+                    sLink.innerHTML = `${displayFlag} ${sec.profile}`;
+                    if (mobileStoriesList) mobileStoriesList.appendChild(sLink);
+                }
+            });
+
 
             // Limpa containers
             heroSlidesContainer.innerHTML = '';
