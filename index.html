@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Garante que o navegador saiba que o site é escuro e não tente inverter cores -->
     <meta name="color-scheme" content="dark">
     <title>Projeto BSB - BRICS Street Boys</title>
     
@@ -61,7 +62,7 @@
             font-family: 'Inter', sans-serif;
             font-weight: 900;
             font-size: 2rem;
-            /* Cores originais vibrantes com brilho branco */
+            /* Cores vibrantes com animação de brilho branco */
             background: linear-gradient(
                 110deg, 
                 #6366f1 20%, 
@@ -75,9 +76,12 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -1px;
-            /* Glow ajustado para não escurecer, mas iluminar */
+            /* Glow ajustado */
             filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.6));
             animation: energyFlow 10s linear infinite;
+            /* Força o navegador a respeitar as cores definidas, ignorando ajustes automáticos do sistema */
+            forced-color-adjust: none;
+            -webkit-print-color-adjust: exact;
         }
 
         @keyframes energyFlow {
@@ -175,11 +179,17 @@
             position: fixed; bottom: 90px; right: 20px; 
             width: 50px; height: 50px; border-radius: 50%;
             background: var(--primary); color: white;
-            border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border: none; 
+            /* Glow discreto adicionado */
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5), 0 4px 10px rgba(0,0,0,0.4);
             display: flex; align-items: center; justify-content: center;
-            z-index: 150; cursor: pointer; transition: transform 0.2s;
+            z-index: 150; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
         }
-        .search-fab:hover { transform: scale(1.1); background: var(--primary-hover); }
+        .search-fab:hover { 
+            transform: scale(1.1); 
+            background: var(--primary-hover); 
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.7), 0 6px 15px rgba(0,0,0,0.5);
+        }
 
         .search-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -256,6 +266,7 @@
 
         .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); z-index: -1; }
         
+        /* Ajuste de opacidade: 1/3 transparente, depois escurece */
         .hero-overlay-dark { 
             position: absolute; 
             inset: 0; 
@@ -817,6 +828,78 @@
             return section.flag;
         }
 
+        function generateData() {
+            const principalSongs = [];
+            rawSections.forEach(sec => sec.songs.forEach(s => { if(s.isPrincipal) principalSongs.push({ ...s, displayContext: sec.profile }); }));
+            albumSection = { 
+                id: 'album-guerreiros', 
+                profile: 'Álbum Oficial', 
+                country: 'Guerreiros da Nação', 
+                flag: '🌟', 
+                gradient: 'linear-gradient(135deg, #ec4899, #db2777)', 
+                desc: 'A coleção oficial com os principais hits do projeto.', 
+                songs: principalSongs, 
+                heroImage: './Capa Principal Final Projeto BSB Guerreiros da Nação 03.10.25.jpg',
+                heroImageDesktop: './Capa Principal Final Projeto BSB Guerreiros da Nação 03.10.25 Tela Full.jpg' 
+            };
+            generateFavoritesSection();
+            sections = [albumSection, favoritesSection, ...rawSections];
+            allPlayableSongs = [];
+            
+            const albumFileSet = new Set(principalSongs.map(s => s.file));
+            
+            // 1. Add Album Songs
+            principalSongs.forEach(s => {
+                allPlayableSongs.push({ 
+                    ...s, 
+                    sectionName: albumSection.profile, 
+                    sectionGradient: albumSection.gradient, 
+                    flag: albumSection.flag, 
+                    sectionId: albumSection.id 
+                });
+            });
+
+            // 2. Add remaining songs from Raw Sections
+            rawSections.forEach(sec => {
+                sec.songs.forEach(s => {
+                    if (!albumFileSet.has(s.file)) {
+                         allPlayableSongs.push({ 
+                            ...s, 
+                            sectionName: sec.profile, 
+                            sectionGradient: sec.gradient, 
+                            flag: sec.flag, 
+                            sectionId: sec.id 
+                        });
+                    }
+                });
+            });
+        }
+
+        function generateFavoritesSection() {
+            const favSongs = [];
+            userFavorites.forEach(filePath => {
+                for(const sec of rawSections) {
+                    const found = sec.songs.find(s => s.file === filePath);
+                    if(found) {
+                        favSongs.push({ ...found, displayContext: sec.profile });
+                        break;
+                    }
+                }
+            });
+
+            favoritesSection = { 
+                id: 'favoritos', 
+                profile: 'Meus Favoritos', 
+                country: 'Sua Seleção', 
+                flag: '❤️', 
+                gradient: 'linear-gradient(135deg, #f43f5e, #be123c)', 
+                desc: 'Sua lista pessoal de músicas favoritas.', 
+                songs: favSongs 
+            };
+            
+            if(sections.length > 1) sections[1] = favoritesSection;
+        }
+
         function createSectionHTML(section) {
             const flagHTML = getFlagContent(section, 'section');
             const historyTitle = section.id === 'album-guerreiros' ? 'História por trás do álbum' : 'História por trás das músicas';
@@ -918,78 +1001,6 @@
             lucide.createIcons({ root: resultsContainer });
         }
 
-        function generateData() {
-            const principalSongs = [];
-            rawSections.forEach(sec => sec.songs.forEach(s => { if(s.isPrincipal) principalSongs.push({ ...s, displayContext: sec.profile }); }));
-            albumSection = { 
-                id: 'album-guerreiros', 
-                profile: 'Álbum Oficial', 
-                country: 'Guerreiros da Nação', 
-                flag: '🌟', 
-                gradient: 'linear-gradient(135deg, #ec4899, #db2777)', 
-                desc: 'A coleção oficial com os principais hits do projeto.', 
-                songs: principalSongs, 
-                heroImage: './Capa Principal Final Projeto BSB Guerreiros da Nação 03.10.25.jpg',
-                heroImageDesktop: './Capa Principal Final Projeto BSB Guerreiros da Nação 03.10.25 Tela Full.jpg' 
-            };
-            generateFavoritesSection();
-            sections = [albumSection, favoritesSection, ...rawSections];
-            allPlayableSongs = [];
-            
-            const albumFileSet = new Set(principalSongs.map(s => s.file));
-            
-            // 1. Add Album Songs
-            principalSongs.forEach(s => {
-                allPlayableSongs.push({ 
-                    ...s, 
-                    sectionName: albumSection.profile, 
-                    sectionGradient: albumSection.gradient, 
-                    flag: albumSection.flag, 
-                    sectionId: albumSection.id 
-                });
-            });
-
-            // 2. Add remaining songs from Raw Sections
-            rawSections.forEach(sec => {
-                sec.songs.forEach(s => {
-                    if (!albumFileSet.has(s.file)) {
-                         allPlayableSongs.push({ 
-                            ...s, 
-                            sectionName: sec.profile, 
-                            sectionGradient: sec.gradient, 
-                            flag: sec.flag, 
-                            sectionId: sec.id 
-                        });
-                    }
-                });
-            });
-        }
-
-        function generateFavoritesSection() {
-            const favSongs = [];
-            userFavorites.forEach(filePath => {
-                for(const sec of rawSections) {
-                    const found = sec.songs.find(s => s.file === filePath);
-                    if(found) {
-                        favSongs.push({ ...found, displayContext: sec.profile });
-                        break;
-                    }
-                }
-            });
-
-            favoritesSection = { 
-                id: 'favoritos', 
-                profile: 'Meus Favoritos', 
-                country: 'Sua Seleção', 
-                flag: '❤️', 
-                gradient: 'linear-gradient(135deg, #f43f5e, #be123c)', 
-                desc: 'Sua lista pessoal de músicas favoritas.', 
-                songs: favSongs 
-            };
-            
-            if(sections.length > 1) sections[1] = favoritesSection;
-        }
-
         function updateSongListUI() {
             const currentSong = playQueue[currentSongIndex];
             if (!currentSong) return;
@@ -1080,6 +1091,7 @@
             }).join('');
         }
 
+        // Logic for lazy loading metadata
         function loadCoverArt(url, imgId, iconId) {
             if (typeof jsmediatags === 'undefined') return;
             try {
@@ -1602,6 +1614,7 @@
                 }
             } else { btn.classList.remove('active'); }
         }
+        function shuffleQueue() { }
         function seekRelative(sec) { audio.currentTime += sec; }
         function seekAudio(e) {
             const width = e.target.clientWidth;
