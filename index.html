@@ -61,7 +61,6 @@
             font-family: 'Inter', sans-serif;
             font-weight: 900;
             font-size: 2rem;
-            /* Cores originais vibrantes com brilho branco */
             background: linear-gradient(
                 110deg, 
                 #6366f1 20%, 
@@ -104,13 +103,43 @@
         .dropdown-menu::-webkit-scrollbar { width: 6px; }
         .dropdown-menu::-webkit-scrollbar-track { background: var(--bg-card); }
         .dropdown-menu::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        
         .nav-item:hover .dropdown-menu { display: block; animation: fadeIn 0.2s ease; }
+        
+        /* Estilização ESPECIAL para o Submenu de Histórias */
+        #storiesSubmenu {
+            min-width: 400px;
+            padding: 10px;
+            grid-template-columns: 1fr 1fr; /* Duas colunas */
+            gap: 8px;
+        }
+        
+        /* Sobrescreve o display block padrão apenas para o menu de histórias quando hover */
+        .nav-item:hover #storiesSubmenu {
+            display: grid; 
+        }
+
+        #storiesSubmenu a {
+            display: flex; align-items: center; gap: 10px; padding: 10px;
+            color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: none;
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
+            border-radius: 6px; background: rgba(255,255,255,0.02);
+        }
+        #storiesSubmenu a:hover { 
+            background: var(--bg-card-hover); color: white; 
+            border-color: var(--primary); transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            padding-left: 10px; /* Anula o padding-left padrão do outro menu */
+        }
+        
         .dropdown-menu a {
             display: flex; align-items: center; gap: 10px; padding: 12px 15px;
             color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: none;
             border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
         }
-        .dropdown-menu a:hover { background: var(--bg-card-hover); color: white; padding-left: 20px; }
+        /* Apenas para o menu padrão (playlist), não afeta o de histórias pois foi sobrescrito acima */
+        .dropdown-menu:not(#storiesSubmenu) a:hover { background: var(--bg-card-hover); color: white; padding-left: 20px; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
         .mobile-toggle { display: none; background: none; border: none; color: white; cursor: pointer; }
@@ -152,7 +181,6 @@
 
         .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); z-index: -1; }
         
-        /* Ajuste de opacidade: 1/3 transparente, depois escurece */
         .hero-overlay-dark { 
             position: absolute; 
             inset: 0; 
@@ -439,6 +467,10 @@
                     <a href="#playlist">Playlist</a>
                     <div class="dropdown-menu" id="playlistSubmenu"></div>
                 </li>
+                <li class="nav-item">
+                    <a href="#">Histórias</a>
+                    <div class="dropdown-menu" id="storiesSubmenu"></div>
+                </li>
                 <li class="nav-item"><a href="#clips">Clipes</a></li>
                 <li class="nav-item"><a href="#about">Sobre</a></li>
             </ul>
@@ -446,6 +478,7 @@
         <div class="mobile-menu" id="mobileMenu">
             <a href="#" onclick="window.scrollTo(0,0); toggleMenu(); return false;">Início</a>
             <a href="#playlist" onclick="toggleMenu()">Playlist</a>
+            <a href="#stories" onclick="toggleMenu()">Histórias</a>
             <a href="#clips" onclick="toggleMenu()">Clipes</a>
             <a href="#about" onclick="toggleMenu()">Sobre</a>
         </div>
@@ -735,8 +768,15 @@
             return `<div class="section-header"><div class="section-flag">${flagHTML}</div><div class="section-title"><h3>${section.profile} <span class="badge">${section.country}</span></h3><div style="display:flex; flex-direction:column; gap:2px;"><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; margin-top:4px;">${section.songs.length} faixas</small><small style="color: #94a3b8; display:flex; align-items:center; gap:4px; cursor:pointer; transition:0.2s;" onclick="toggleHistory('${section.id}')" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'"><i data-lucide="info" size="14"></i> ${historyTitle}</small></div></div></div><div class="history-panel" id="history-${section.id}"><div class="history-content"><button class="close-history" onclick="toggleHistory('${section.id}')"><i data-lucide="x" size="16"></i></button><strong>Contexto:</strong><br>Aqui você descobre a inspiração técnica e artística por trás das faixas de ${section.profile}.<br>A IA capturou a essência de dados e cultura para criar algo novo.</div></div><div class="song-grid" id="grid-${section.id}">${renderSongCards(section)}</div>`;
         }
 
+        function openSectionHistory(id) {
+            const panel = document.getElementById('history-' + id);
+            if (panel && !panel.classList.contains('open')) {
+                panel.classList.add('open');
+            }
+            scrollToSection(id);
+        }
+
         function updateSongListUI() {
-            // This function syncs ALL song cards with the current player state
             const currentSong = playQueue[currentSongIndex];
             if (!currentSong) return;
 
@@ -756,15 +796,12 @@
                     card.classList.remove('active', 'playing');
                 }
 
-                // Sync Play/Pause Icon inside card
+                // Sync Play/Pause Icon
                 const iconContainer = card.querySelector('.play-btn-small');
                 if (iconContainer) {
-                    // Re-render icon to ensure we have a fresh SVG handle
-                    if (isCurrent && isPlaying) {
-                        iconContainer.innerHTML = '<i data-lucide="pause" size="18"></i>';
-                    } else {
-                        iconContainer.innerHTML = '<i data-lucide="play" size="18"></i>';
-                    }
+                    iconContainer.innerHTML = (isCurrent && isPlaying) 
+                        ? '<i data-lucide="pause" size="18"></i>' 
+                        : '<i data-lucide="play" size="18"></i>';
                     lucide.createIcons({ root: iconContainer });
                 }
             });
@@ -807,7 +844,7 @@
                         </div>
                         <div class="song-actions desktop-actions">
                             <button class="action-btn fav-btn ${activeClass}" data-file="${song.file}" onclick="toggleFavorite('${song.file}')"><i data-lucide="heart" size="18" ${fillAttr}></i></button>
-                            <a href="${song.file}" download="${song.title}.mp3" class="action-btn" title="Download" style="display:flex; align-items:center; justify-content:center; text-decoration:none;"><i data-lucide="download" size="18"></i></a>
+                            <a href="${song.file}" download="${song.title}.mp3" class="action-btn" title="Download" style="display:flex; align-items:center; justify-content:center; text-decoration:none; color:inherit;"><i data-lucide="download" size="18"></i></a>
                             <button class="action-btn" onclick="toggleLyrics('lyrics-${domId}')"><i data-lucide="mic-2" size="18"></i></button>
                             <button class="play-btn-small" onclick="playSpecificContext('${section.id}', ${songIdx})"><i data-lucide="play" size="18" id="btn-icon-${domId}"></i></button>
                         </div>
@@ -816,7 +853,7 @@
                             <button class="play-btn-small" onclick="playSpecificContext('${section.id}', ${songIdx})"><i data-lucide="play" size="18" id="btn-icon-${domId}"></i></button>
                             <div class="mobile-popup" id="popup-${domId}">
                                 <button class="action-btn fav-btn ${activeClass}" data-file="${song.file}" onclick="toggleFavorite('${song.file}')"><i data-lucide="heart" size="18" ${fillAttr}></i></button>
-                                <a href="${song.file}" download="${song.title}.mp3" class="action-btn" title="Download"><i data-lucide="download" size="18"></i></a>
+                                <a href="${song.file}" download="${song.title}.mp3" class="action-btn" title="Download" style="display:flex; align-items:center; justify-content:center; text-decoration:none; color:inherit;"><i data-lucide="download" size="18"></i></a>
                                 <button class="action-btn" onclick="toggleLyrics('lyrics-${domId}')"><i data-lucide="mic-2" size="18"></i></button>
                             </div>
                         </div>
@@ -828,6 +865,7 @@
             }).join('');
         }
 
+        // Logic for lazy loading metadata
         function loadCoverArt(url, imgId, iconId) {
             if (typeof jsmediatags === 'undefined') return;
             try {
@@ -1144,13 +1182,21 @@
 
         function playSpecificContext(sectionId, songIndex) { 
             const section = sections.find(s => s.id === sectionId); 
-            // We want to play THIS song, then continue with the rest of the context.
-            // If shuffle is on, we play this song, then shuffle the REST.
             
+            // Check if playing current song
+            if(playQueue.length > 0 && currentSongIndex >= 0 && currentSongIndex < playQueue.length) {
+                const currentSong = playQueue[currentSongIndex];
+                // Match by file as domId might change if queue was rebuilt
+                if(currentSong.file === section.songs[songIndex].file) {
+                    togglePlay();
+                    return; // Just toggle and exit
+                }
+            }
+
+            // Otherwise build queue and play
             playQueue = section.songs.map((s, idx) => ({ ...s, sectionName: section.profile, sectionGradient: section.gradient, flag: section.flag, domId: `${sectionId}-${idx}` })); 
             
             if(isShuffle) {
-                // Move selected song to start, shuffle the rest
                 const selected = playQueue[songIndex];
                 const others = playQueue.filter((_, i) => i !== songIndex);
                 shuffleArray(others);
@@ -1159,7 +1205,6 @@
             } else {
                 currentSongIndex = songIndex; 
             }
-            
             loadAndPlay(); 
         }
 
@@ -1204,24 +1249,34 @@
             if (currentSongIndex < 0 || currentSongIndex >= playQueue.length) return;
             const song = playQueue[currentSongIndex];
             
-            // Check cache logic here: if src matches, don't reload
-            // Correction: actually we often want to reset playback position to 0 if "play" is clicked again.
-            // But if it's the exact same file playing, we might just want to ensure it plays.
-            const currentSrc = audio.src ? decodeURIComponent(audio.src.split(window.location.origin + '/').pop()) : '';
-            // Note: simple check. 
-            // Better to force load to ensure state consistency for now, browser handles caching well.
-            
-            document.querySelectorAll('.song-card.active').forEach(el => el.classList.remove('active', 'playing'));
-            document.querySelectorAll('.play-btn-small i[data-lucide="pause"]').forEach(el => { el.setAttribute('data-lucide', 'play'); lucide.createIcons({ root: el.parentElement }); });
-            
             audio.src = song.file; 
+
+            // Configura título
+            const titleEl = document.getElementById('playerTitleContent');
+            titleEl.innerText = song.title;
+            titleEl.classList.remove('animate'); 
             
-            // Player Art Logic (Lazy load inside player too)
+            setTimeout(() => {
+                const container = document.getElementById('playerTitleContainer');
+                if(titleEl.offsetWidth > container.offsetWidth) {
+                     titleEl.classList.add('animate');
+                } else {
+                     titleEl.classList.remove('animate');
+                }
+            }, 50);
+
+            document.getElementById('playerMeta').innerText = `${song.sectionName} • ${song.flag}`;
+            document.getElementById('playerArt').style.background = song.sectionGradient;
+            document.getElementById('footerWaves').classList.add('active');
+            document.getElementById('playerBar').classList.add('visible');
+
+            // Metadata & Art
+            updateMediaSession(song, null); 
             const playerArtImg = document.getElementById('playerArtImg');
             const playerIcon = document.getElementById('staticFooterIcon');
             playerArtImg.style.display = 'none';
             playerIcon.style.display = 'block';
-            
+
             if (typeof jsmediatags !== 'undefined') {
                 try {
                     const absoluteUrl = new URL(song.file, document.baseURI).href;
@@ -1233,47 +1288,23 @@
                                 let base64String = "";
                                 for (let i = 0; i < data.length; i++) { base64String += String.fromCharCode(data[i]); }
                                 const base64 = "data:" + format + ";base64," + window.btoa(base64String);
-                                playerArtImg.src = base64;
-                                playerArtImg.style.display = 'block';
+                                playerArtImg.src = base64; 
+                                playerArtImg.style.display = 'block'; 
                                 playerIcon.style.display = 'none';
-                                
-                                // Also set metadata for Media Session
                                 updateMediaSession(song, base64);
-                            } else {
-                                updateMediaSession(song, null);
                             }
-                        },
-                        onError: function(e) { updateMediaSession(song, null); }
+                        }, onError: function(e) {}
                     });
-                } catch(e){ updateMediaSession(song, null); }
-             } else {
-                 updateMediaSession(song, null);
-             }
-
-            document.getElementById('playerTitleContent').innerText = song.title;
-            // Handle marquee
-            const titleEl = document.getElementById('playerTitleContent');
-            const container = document.getElementById('playerTitleContainer');
-            if(titleEl.offsetWidth > container.offsetWidth) {
-                 titleEl.classList.add('animate');
-            } else {
-                 titleEl.classList.remove('animate');
+                } catch(e){}
             }
-
-            document.getElementById('playerMeta').innerText = `${song.sectionName} • ${song.flag}`;
-            document.getElementById('playerArt').style.background = song.sectionGradient;
-            document.getElementById('footerWaves').classList.add('active');
-            document.getElementById('playerBar').classList.add('visible');
             
-            updateSongListUI();
+            updateSongListUI(); 
 
-            // Play with error handling
             var playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(_ => {
                     isPlaying = true;
                     updateGlobalPlayButton();
-                    // Media Session state
                     if('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
                     updateSongListUI();
                 })
@@ -1289,14 +1320,9 @@
         function updateMediaSession(song, artworkSrc) {
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
-                    title: song.title,
-                    artist: "Projeto BSB",
-                    album: song.sectionName,
-                    artwork: [
-                        { src: artworkSrc || 'https://via.placeholder.com/512?text=BSB', sizes: '512x512', type: 'image/png' }
-                    ]
+                    title: song.title, artist: "Projeto BSB", album: song.sectionName,
+                    artwork: [ { src: artworkSrc || 'https://via.placeholder.com/512?text=BSB', sizes: '512x512', type: 'image/png' } ]
                 });
-                
                 navigator.mediaSession.setActionHandler('play', togglePlay);
                 navigator.mediaSession.setActionHandler('pause', togglePlay);
                 navigator.mediaSession.setActionHandler('previoustrack', prevSong);
@@ -1379,9 +1405,7 @@
                      playQueue = [currentSong, ...remainder];
                      currentSongIndex = 0; 
                 }
-            } else { 
-                btn.classList.remove('active'); 
-            }
+            } else { btn.classList.remove('active'); }
         }
         function shuffleQueue() { }
         function seekRelative(sec) { audio.currentTime += sec; }
@@ -1425,6 +1449,7 @@
             const playlistContainer = document.getElementById('playlist');
             const indicatorsContainer = document.getElementById('carouselIndicators');
             const submenuContainer = document.getElementById('playlistSubmenu');
+            const storiesContainer = document.getElementById('storiesSubmenu');
 
             document.getElementById('btnPlayAllText').innerText = `Todas (${allPlayableSongs.length})`;
 
@@ -1444,19 +1469,42 @@
             }
 
             submenuContainer.innerHTML = '';
+            storiesContainer.innerHTML = '';
             sections.forEach(sec => {
+                // Playlist Menu
                 const link = document.createElement('a');
                 link.href = `#${sec.id}`;
                 link.onclick = (e) => { e.preventDefault(); scrollToSection(sec.id); };
                 const displayFlag = sec.countryCode ? getFlagContent(sec, 'submenu') : `<span>${sec.flag}</span>`;
                 link.innerHTML = `${displayFlag} ${sec.profile}`;
                 submenuContainer.appendChild(link);
+
+                // Stories Menu (Skip Favorites)
+                if (sec.id !== 'favoritos') {
+                    const storyLink = document.createElement('a');
+                    storyLink.href = `#`;
+                    storyLink.onclick = (e) => { 
+                        e.preventDefault(); 
+                        openSectionHistory(sec.id); 
+                    };
+                    storyLink.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px; width:100%;">
+                            <div style="font-size:1.2rem;">${displayFlag}</div>
+                            <div style="display:flex; flex-direction:column; line-height:1.2;">
+                                <span class="story-link-title" style="font-weight:700; color:white; font-size:0.8rem;">${sec.profile}</span>
+                                <span class="story-link-country" style="font-size:0.7rem; color:var(--text-muted);">${sec.country}</span>
+                            </div>
+                        </div>
+                    `;
+                    storiesContainer.appendChild(storyLink);
+                }
             });
 
             // Limpa containers
             heroSlidesContainer.innerHTML = '';
             playlistContainer.innerHTML = '';
             indicatorsContainer.innerHTML = '';
+            // storiesContainer handled above
 
             // CSS dinâmico para a capa responsiva
             const style = document.createElement('style');
@@ -1471,7 +1519,6 @@
                 }
             `;
             document.head.appendChild(style);
-
 
             // Renderiza Seções e Banner
             sections.forEach((section, idx) => {
@@ -1567,6 +1614,8 @@
             lucide.createIcons();
             updateStickyBar('album-guerreiros');
             window.addEventListener('scroll', onScrollSpy);
+            
+            // Force start animation immediately
             startCarousel();
             const progressFill = document.getElementById('carouselProgressFill');
             if(progressFill) {
