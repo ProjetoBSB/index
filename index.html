@@ -80,7 +80,9 @@
             z-index: 10;
         }
 
-        @keyframes energyFlow { to { background-position: -200% center; } }
+        @keyframes energyFlow {
+            to { background-position: -200% center; }
+        }
 
         .nav-links { display: flex; gap: 2rem; position: relative; }
         .nav-item { position: relative; }
@@ -106,7 +108,13 @@
         .dropdown-menu::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
         .nav-item:hover .dropdown-menu { display: block; animation: fadeIn 0.2s ease; }
         
-        #storiesSubmenu { min-width: 400px; padding: 10px; grid-template-columns: 1fr 1fr; gap: 8px; }
+        /* Stories Submenu Grid Style */
+        #storiesSubmenu {
+            min-width: 400px;
+            padding: 10px;
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px;
+        }
         .nav-item:hover #storiesSubmenu { display: grid; }
 
         #storiesSubmenu a {
@@ -118,10 +126,15 @@
         #storiesSubmenu a:hover { 
             background: var(--bg-card-hover); color: white; 
             border-color: var(--primary); transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); padding-left: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            padding-left: 10px; 
         }
         
-        .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 15px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: none; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
+        .dropdown-menu a {
+            display: flex; align-items: center; gap: 10px; padding: 12px 15px;
+            color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: none;
+            border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
+        }
         .dropdown-menu:not(#storiesSubmenu) a:hover { background: var(--bg-card-hover); color: white; padding-left: 20px; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
@@ -143,11 +156,17 @@
             display: flex; justify-content: space-between; align-items: center;
             cursor: pointer; background: rgba(255,255,255,0.02);
         }
-        .mobile-dropdown-content { display: none; background: rgba(0,0,0,0.2); flex-direction: column; }
+        .mobile-dropdown-content {
+            display: none; background: rgba(0,0,0,0.2);
+            flex-direction: column;
+        }
         .mobile-dropdown-content.open { display: flex; }
         .mobile-dropdown-content a {
-            padding: 1rem 1rem 1rem 2.5rem; border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.85rem; color: #cbd5e1; display: flex; align-items: center; gap: 8px; font-weight: 500;
+            padding: 1rem 1rem 1rem 2.5rem; 
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.85rem; color: #cbd5e1;
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 500;
         }
         .mobile-dropdown-content a:last-child { border-bottom: none; }
         
@@ -163,25 +182,38 @@
         }
         .search-modal.active { display: flex; opacity: 1; }
         .search-content {
-            width: 90%; max-width: 600px; background: var(--bg-card); border: 1px solid #334155;
-            border-radius: 12px; padding: 1.5rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 90%; max-width: 600px;
+            background: var(--bg-card); border: 1px solid #334155;
+            border-radius: 12px; padding: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             display: flex; flex-direction: column; gap: 1rem;
         }
         .search-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .search-header h3 { margin: 0; }
         .close-search { background: none; border: none; color: var(--text-muted); cursor: pointer; }
+        .close-search:hover { color: white; }
+
         .search-input-wrapper { position: relative; }
         .search-input {
-            width: 100%; padding: 1rem 1rem 1rem 3rem; background: var(--bg-dark); border: 1px solid #334155;
+            width: 100%; padding: 1rem 1rem 1rem 3rem;
+            background: var(--bg-dark); border: 1px solid #334155;
             border-radius: 8px; color: white; font-size: 1rem;
         }
         .search-input:focus { outline: none; border-color: var(--primary); }
         .search-icon-input { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .search-results { max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .search-results {
+            max-height: 50vh; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
         .search-result-item {
-            display: flex; align-items: center; gap: 1rem; padding: 0.8rem; border-radius: 8px;
-            background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 1rem;
+            padding: 0.8rem; border-radius: 8px;
+            background: rgba(255,255,255,0.03); cursor: pointer;
+            transition: 0.2s;
         }
         .search-result-item:hover { background: var(--bg-card-hover); }
+        .search-result-info { display: flex; flex-direction: column; }
         .search-result-title { font-weight: 700; color: white; font-size: 0.95rem; }
         .search-result-meta { font-size: 0.8rem; color: var(--text-muted); }
 
@@ -279,7 +311,6 @@
             .nav-zone { display: none; }
         }
         
-        /* Botões redondos da barra fixa */
         .round-icon-btn {
             width: 40px; height: 40px; border-radius: 50%; padding: 0;
             display: flex; align-items: center; justify-content: center;
@@ -339,6 +370,15 @@
         .song-card.active .song-title { color: var(--primary); }
         .song-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
         .song-actions { display: flex; gap: 0.25rem; align-items: center; }
+        
+        .desktop-actions { display: flex; }
+        .mobile-actions-trigger { display: none; }
+        
+        @media (max-width: 640px) {
+            .desktop-actions { display: none; }
+            .mobile-actions-trigger { display: flex; }
+        }
+
         .action-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 50%; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .action-btn:hover { color: white; background: var(--bg-card-hover); transform: scale(1.1); }
         .play-btn-small { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card-hover); color: var(--text-muted); display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -350,15 +390,9 @@
         .lyrics-panel.open { max-height: 600px; }
         .lyrics-content { padding: 1.5rem; text-align: center; font-size: 0.95rem; color: #cbd5e1; line-height: 1.8; font-style: italic; }
 
-        /* Mobile */
-        .mobile-actions-trigger { display: none; }
-        .desktop-actions { display: flex; gap: 0.25rem; }
-        @media (max-width: 640px) {
-            .mobile-actions-trigger { display: flex; }
-            .desktop-actions { display: none; }
-            .mobile-popup { display: none; position: absolute; right: 40px; background: #334155; padding: 5px; border-radius: 8px; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-direction: row; }
-            .mobile-popup.show { display: flex; }
-        }
+        /* Mobile Popup */
+        .mobile-popup { display: none; position: absolute; right: 40px; background: #334155; padding: 5px; border-radius: 8px; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-direction: row; }
+        .mobile-popup.show { display: flex; }
 
         /* CLIPS SECTION */
         #clips { padding: 3rem 0; background: var(--bg-card-hover); margin-bottom: 2rem; }
@@ -461,12 +495,12 @@
             <ul class="nav-links">
                 <li class="nav-item"><a href="#" onclick="window.scrollTo(0,0); return false;">Início</a></li>
                 <li class="nav-item">
-                    <a href="#playlist">Playlist</a>
-                    <div class="dropdown-menu" id="playlistSubmenu"></div>
-                </li>
-                <li class="nav-item">
                     <a href="#">Histórias</a>
                     <div class="dropdown-menu" id="storiesSubmenu"></div>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Playlist</a>
+                    <div class="dropdown-menu" id="playlistSubmenu"></div>
                 </li>
                 <li class="nav-item"><a href="#clips" onclick="event.preventDefault(); scrollToSection('clips');">Clipes</a></li>
                 <li class="nav-item"><a href="#about" onclick="event.preventDefault(); scrollToSection('about');">Sobre</a></li>
@@ -475,16 +509,6 @@
         <div class="mobile-menu" id="mobileMenu">
             <a href="#" onclick="window.scrollTo(0,0); toggleMenu(); return false;">Início</a>
             
-            <!-- Container Playlist -->
-            <div class="mobile-dropdown-group">
-                <div class="mobile-dropdown-header" onclick="toggleMobileSubmenu('mobile-playlist-list')">
-                    Playlist <i data-lucide="chevron-down"></i>
-                </div>
-                <div class="mobile-dropdown-content" id="mobile-playlist-list">
-                    <!-- JS injects here -->
-                </div>
-            </div>
-
             <!-- Container Histórias -->
             <div class="mobile-dropdown-group">
                 <div class="mobile-dropdown-header" onclick="toggleMobileSubmenu('mobile-stories-list')">
@@ -492,6 +516,16 @@
                 </div>
                 <div class="mobile-dropdown-content" id="mobile-stories-list">
                      <!-- JS injects here -->
+                </div>
+            </div>
+
+            <!-- Container Playlist -->
+            <div class="mobile-dropdown-group">
+                <div class="mobile-dropdown-header" onclick="toggleMobileSubmenu('mobile-playlist-list')">
+                    Playlist <i data-lucide="chevron-down"></i>
+                </div>
+                <div class="mobile-dropdown-content" id="mobile-playlist-list">
+                    <!-- JS injects here -->
                 </div>
             </div>
 
@@ -535,7 +569,7 @@
                 <button class="btn btn-primary btn-responsive-text" onclick="playAllSongs()" title="Tocar todas as músicas">
                     <i data-lucide="play" style="width: 16px;"></i> <span id="btnPlayAllText">Todas</span>
                 </button>
-                <button id="btnShuffle" class="round-icon-btn btn-glass" onclick="toggleShuffle()" title="Misturar">
+                <button id="btnShuffle" class="round-icon-btn btn-glass" onclick="toggleShuffle()" title="Ativar Misturar Músicas">
                     <i data-lucide="shuffle" style="width: 18px;"></i>
                 </button>
                  <button class="round-icon-btn btn-primary" onclick="toggleSearch()" title="Pesquisar">
@@ -1261,7 +1295,9 @@
         
         function playAllShuffle() {
             isShuffle = true;
-            document.getElementById('btnShuffle').classList.add('active'); 
+            const btn = document.getElementById('btnShuffle');
+            btn.classList.add('active'); 
+            btn.title = "Desativar Misturar Músicas";
             playAllSongs();
         }
 
@@ -1311,7 +1347,7 @@
             if (targetId) {
                 const element = document.getElementById(targetId);
                 if (element) {
-                    const offset = 280; 
+                    const offset = 120; 
                     const pos = element.getBoundingClientRect().top + window.pageYOffset - offset;
                     window.scrollTo({ top: pos, behavior: "smooth" });
                     element.style.transition = "transform 0.3s, box-shadow 0.3s";
@@ -1441,14 +1477,14 @@
                     card.classList.remove('active', 'playing');
                 }
 
-                // Update ALL play buttons in the card (both desktop and mobile)
-                const iconContainers = card.querySelectorAll('.play-btn-small');
-                iconContainers.forEach(container => {
-                    container.innerHTML = (isCurrent && isPlaying) 
+                const iconContainer = card.querySelector('.play-btn-small');
+                if (iconContainer) {
+                    // Force refresh icon
+                    iconContainer.innerHTML = (isCurrent && isPlaying) 
                         ? '<i data-lucide="pause" size="18"></i>' 
                         : '<i data-lucide="play" size="18"></i>';
-                    lucide.createIcons({ root: container });
-                });
+                    lucide.createIcons({ root: iconContainer });
+                }
             });
         }
 
@@ -1473,6 +1509,7 @@
             const btn = document.getElementById('btnShuffle');
             if(isShuffle) { 
                 btn.classList.add('active'); 
+                btn.title = "Desativar Misturar Músicas";
                 if (playQueue.length > 0) {
                      const currentSong = playQueue[currentSongIndex];
                      const remainder = playQueue.filter((_, i) => i !== currentSongIndex);
@@ -1480,7 +1517,10 @@
                      playQueue = [currentSong, ...remainder];
                      currentSongIndex = 0; 
                 }
-            } else { btn.classList.remove('active'); }
+            } else { 
+                btn.classList.remove('active'); 
+                btn.title = "Ativar Misturar Músicas";
+            }
         }
         function shuffleQueue() { }
         function seekRelative(sec) { audio.currentTime += sec; }
@@ -1503,6 +1543,17 @@
 
         audio.onplay = () => { isPlaying = true; updateGlobalPlayButton(); updateSongListUI(); };
         audio.onpause = () => { isPlaying = false; updateGlobalPlayButton(); updateSongListUI(); };
+
+        function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('active'); }
+        function toggleLyrics(id) { document.getElementById(id).classList.toggle('open'); }
+        function toggleHistory(id) { document.getElementById('history-'+id).classList.toggle('open'); }
+        function toggleMobilePopup(id) { document.querySelectorAll('.mobile-popup').forEach(p => { if(p.id !== id) p.classList.remove('show'); }); document.getElementById(id).classList.toggle('show'); }
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            const offset = (id === 'about') ? 150 : 120;
+            const pos = el.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({ top: pos, behavior: "smooth" });
+        }
 
         // --- INIT FUNCTION (DEFINED AT THE END TO ENSURE ALL IS READY) ---
         function init() {
@@ -1534,7 +1585,7 @@
             submenuContainer.innerHTML = '';
             storiesContainer.innerHTML = '';
             sections.forEach(sec => {
-                // Playlist Menu
+                // Playlist Menu (Now second in DOM structure after swap)
                 const link = document.createElement('a');
                 link.href = `#${sec.id}`;
                 link.onclick = (e) => { e.preventDefault(); scrollToSection(sec.id); };
@@ -1542,7 +1593,7 @@
                 link.innerHTML = `${displayFlag} ${sec.profile}`;
                 submenuContainer.appendChild(link);
 
-                // Stories Menu (Skip Favorites)
+                // Stories Menu (Skip Favorites) (Now first in DOM structure after swap)
                 if (sec.id !== 'favoritos') {
                     const storyLink = document.createElement('a');
                     storyLink.href = `#`;
@@ -1578,7 +1629,7 @@
                 pLink.href = `#${sec.id}`;
                 pLink.onclick = (e) => { 
                     e.preventDefault(); 
-                    toggleMenu(); // Close mobile menu
+                    toggleMenu(); 
                     scrollToSection(sec.id); 
                 };
                 pLink.innerHTML = `${displayFlag} ${sec.profile}`;
@@ -1590,7 +1641,7 @@
                     sLink.href = `#`;
                     sLink.onclick = (e) => { 
                         e.preventDefault(); 
-                        toggleMenu(); // Close mobile menu
+                        toggleMenu(); 
                         openSectionHistory(sec.id); 
                     };
                     sLink.innerHTML = `${displayFlag} ${sec.profile}`;
